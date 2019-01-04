@@ -3,7 +3,7 @@ from marshmallow.validate import Range, Length, OneOf, Equal
 from qiskit.validation import BaseModel, BaseSchema, bind_schema
 
 
-class AcQuantumGateConfigSchema(object):
+class AcQuantumGateConfigSchema(BaseSchema):
     """Schema for GateConfig."""
 
     # Required properties.
@@ -95,7 +95,7 @@ class AcQuantumBackendConfiguration(BaseModel):
 
 
 @bind_schema(AcQuantumGateConfigSchema)
-class GateConfig(BaseModel):
+class AcQuantumGateConfig(BaseModel):
     """Model for GateConfig.
 
     Please note that this class only describes the required fields. For the
