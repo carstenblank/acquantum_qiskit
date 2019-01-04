@@ -31,15 +31,36 @@ JOB_FINAL_STATES = (
 
 
 class AcQuantumJob(BaseJob):
+    """
+        Represent the jobs that will be executed on Alibaba Computing Quantum simulators and real
+        devices. Jobs are intended to be created calling ``run()`` on a particular
+        backend.
+
+        Creating a ``AcQuantumJob`` instance does not imply running it. You need to do it in separate steps::
+
+            job = AcQuantumJob(..)
+            job.submit() # will block!
+    """
 
     def __init__(self, backend: AcQuantumBackend, job_id: str, api: AcQuantumConnector, is_device: bool,
                  qobj: Any = None,
                  creation_date: Any = None, api_status: AcQuantumJobStatus = None):
+        """
+        :param backend: The backend instance used to run this job
+        :param job_id: The job ID of an already submitted job
+        :param api: api for communicating with Alibaba Computing Quantum
+        :param is_device: whether backend is a real device
+        :param qobj: Quantum Object
+        :param creation_date:
+        :param api_status:
+
+
+        """
 
         super().__init__(backend, job_id)
 
-        # if qobj is not None:
-        # validate_qobj_against_schema(qobj)
+        if qobj is not None:
+            validate_qobj_against_schema(qobj)
 
         # self._qobj_payload = qobj_to_dict(qobj, version='1.0.0')
         # TODO: No need for this conversion, just use the new equivalent members above
