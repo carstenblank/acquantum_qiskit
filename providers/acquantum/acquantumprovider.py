@@ -1,5 +1,6 @@
 import warnings
 from collections import OrderedDict
+from typing import Callable
 
 from qiskit.providers import BaseProvider
 
@@ -15,7 +16,7 @@ class AcQuantumProvider(BaseProvider):
 
         self._accounts = OrderedDict()
 
-    def backends(self, name=None, filters=None, **kwargs):
+    def backends(self, name: str = None, filters: Callable = None, **kwargs):
         # TODO: add typings
         # credentials_filter = {}
         # for key in ['token', 'url', 'hub', 'group', 'project', 'proxies', 'verify']:
@@ -39,9 +40,7 @@ class AcQuantumProvider(BaseProvider):
         if not self._accounts:
             raise AcQuantumAccountError('No AcQuantum credentials found.')
 
-    def _append_account(self, credentials):
-        # type: (AcQuantumCredentials) -> None
-
+    def _append_account(self, credentials: AcQuantumCredentials):
         if credentials.user_name in self._accounts.keys():
             warnings.warn('Credentials are already in use.')
 
