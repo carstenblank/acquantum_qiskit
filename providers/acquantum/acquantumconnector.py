@@ -1,12 +1,12 @@
 import pickle
 import re
-from typing import List, Any
+from typing import Any
 
 import requests
 
 from providers.acquantum.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.models.Gates import Gate
-from providers.acquantum.models.Model import AcQuantumResponse, AcQuantumErrorResponse, AcQuantumExperiment, \
+from providers.acquantum.models.Model import AcQuantumResponse, AcQuantumExperiment, \
     AcQuantumExperimentDetail, \
     AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumResult, AcQuantumResultResponse
 
@@ -18,16 +18,12 @@ class AcQuantumExperimentType(object):
 
 class AcQuantumSession(object):
 
-    def __init__(self, csrf, cookies, credentials):
-        # type: (str, Any, AcQuantumCredentials) -> None
-
+    def __init__(self, csrf: str, cookies: Any, credentials: AcQuantumCredentials) -> None:
         self.csrf = csrf
         self.cookies = cookies
         self.credentials = credentials
 
-    def __str__(self):
-        # type: () -> str
-
+    def __str__(self) -> str:
         return 'AcSession: [cookies: {}, csrf: {}]'.format(self.cookies, self.csrf)
 
 
@@ -38,13 +34,11 @@ class AcQuantumConnector(object):
     _TOKEN_HEADER_KEY = 'X-CSRF-TOKEN'
 
     def __init__(self):
-        # type: () -> None
-        self._req = requests.session()  # type: requests.Session
-        self._credentials = None  # type: AcQuantumCredentials
-        self._session = None  # type: AcQuantumSession
+        self._req: requests.Session = requests.session()
+        self._credentials: AcQuantumCredentials = None
+        self._session: AcQuantumSession = None
 
-    def create_session(self, credentials):
-        # type: (AcQuantumCredentials) -> None
+    def create_session(self, credentials: AcQuantumCredentials):
         self._credentials = credentials
         csrf = self._request_csrf_token()
         cookies = self._req.cookies
@@ -54,24 +48,20 @@ class AcQuantumConnector(object):
             raise Exception('Connection refused: {}'.format(response['message']))
 
     def reconnect_session(self):
-        # type: () -> None
         print('... reconnecting session')
         self.create_session(self._credentials)
 
     def save_session(self):
-        # type: () -> None
         with open('session', 'wb') as f:
             self._session.cookies = self._req.cookies
             pickle.dump(self._session, f)
 
     def load_session(self):
-        # type: () -> None
         with open('session', 'rb') as f:
             self._session = pickle.load(f)
             self._req.cookies.update(self._session.cookies)
 
-    def _login(self):
-        # type: () -> requests.Response
+    def _login(self) -> requests.Response:
         uri = '{}/login'.format(self._base_uri)
         params = {'_input_charset': 'utf-8'}
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
@@ -83,8 +73,7 @@ class AcQuantumConnector(object):
 
         return self._req.post(uri, data=payload, params=params, headers=headers)
 
-    def create_experiment(self, bit_width, experiment_type, experiment_name):
-        # type: (int, str, str) -> int
+    def create_experiment(self, bit_width: int, experiment_type: str, experiment_name: str) -> int:
         uri = '{}/experiment/infosave'.format(self._base_uri)
         params = {self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1]}
         headers = {self._TOKEN_HEADER_KEY: self._session.csrf, 'Content-Type': 'application/json'}
@@ -96,8 +85,7 @@ class AcQuantumConnector(object):
         response = self.handle_ac_response(self._req.post(uri, params=params, headers=headers, json=payload))
         return response.data
 
-    def update_experiment(self, experiment_id, gates, code=None, override=True):
-        # type: (int, List[Gate], str, bool) -> None
+    def update_experiment(self, experiment_id: int, gates: [Gate], code: str = None, override: bool = True):
         uri = '{}/experiment/codesave'.format(self._base_uri)
         params = {
             self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1]
@@ -115,8 +103,7 @@ class AcQuantumConnector(object):
 
         self.handle_ac_response(self._req.post(uri, json=payload, params=params, headers=headers))
 
-    def get_experiment(self, experiment_id):
-        # type: (int) -> AcQuantumExperiment or AcQuantumErrorResponse
+    def get_experiment(self, experiment_id: int) -> AcQuantumExperiment:
         uri = '{}/experiment/detail'.format(self._base_uri)
         params = {
             'experimentId': experiment_id,
@@ -131,8 +118,7 @@ class AcQuantumConnector(object):
         experiment = AcQuantumExperiment(detail=exp_detail, data=body['data'], code=body['code'])
         return experiment
 
-    def get_experiments(self):
-        # type: () -> [AcQuantumExperimentDetail] or AcQuantumErrorResponse
+    def get_experiments(self) -> [AcQuantumExperimentDetail]:
         uri = '{}/experiment/list'.format(self._base_uri)
         params = {
             self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1]
@@ -146,8 +132,7 @@ class AcQuantumConnector(object):
                                       exp['execution']) for exp in body]
         return experiment_list
 
-    def run_experiment(self, experiment_id, experiment_type, bit_width, shots, seed=None):
-        # type: (int, str, int, int, str) -> None
+    def run_experiment(self, experiment_id: int, experiment_type: str, bit_width: int, shots: int, seed: str = None):
         uri = '{}/experiment/submit'.format(self._base_uri)
         headers = {'Content-Type': 'application/json', self._TOKEN_HEADER_KEY: self._session.csrf}
         params = {
@@ -160,8 +145,7 @@ class AcQuantumConnector(object):
         }
         self.handle_ac_response(self._req.post(uri, headers=headers, params=params))
 
-    def get_result(self, experiment_id):
-        # type: (int) -> AcQuantumResultResponse
+    def get_result(self, experiment_id: int) -> AcQuantumResultResponse:
         uri = '{}/experiment/resultlist'.format(self._base_uri)
         params = {
             'experimentId': experiment_id,
@@ -181,8 +165,7 @@ class AcQuantumConnector(object):
                             res['process'], res['data']) for res in body['realResult']]
         return AcQuantumResultResponse(simulated_result, real_result)
 
-    def download_result(self, experiment_id, file_name=None):
-        # type: (int, str) -> None
+    def download_result(self, experiment_id: int, file_name: str = None):
         uri = '{}/experiment/resultDownload'.format(self._base_uri)
         params = {'id': experiment_id}
         headers = {
@@ -196,14 +179,12 @@ class AcQuantumConnector(object):
         with open(file_name, 'wb') as f:
             f.write(response.content)
 
-    def _request_csrf_token(self):
-        # type: () -> str
+    def _request_csrf_token(self) -> str:
         uri = '{}/login'.format(self._base_uri)
         response = self._req.get(uri)
         return re.search('[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?', response.text).group()
 
-    def delete_experiment(self, experiment_id):
-        # type: (int) -> None
+    def delete_experiment(self, experiment_id: int):
         uri = '{}/experiment/delete'.format(self._base_uri)
         headers = {'Content-Type': 'application/json', self._TOKEN_HEADER_KEY: self._session.csrf}
         params = {
@@ -213,15 +194,12 @@ class AcQuantumConnector(object):
 
         self.handle_ac_response(self._req.post(uri, headers=headers, params=params))
 
-    def available_backends(self):
-        # type: () -> [str]
-
+    def available_backends(self) -> [str]:
         # TODO: implement
         return ['SIMULATE', 'REAL']
 
     @classmethod
-    def handle_ac_response(cls, response):
-        # type: (requests.Response) -> AcQuantumResponse
+    def handle_ac_response(cls, response: requests.Response) -> AcQuantumResponse:
         r"""
         :param response: requests.Response
         :return: AcResponse
