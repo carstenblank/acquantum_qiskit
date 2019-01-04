@@ -22,6 +22,7 @@ class AcQuantumSingleProvider(BaseProvider):
 
     def backends(self, name=None, **kwargs):
         # TODO: add typings
+        # TODO: implement
         backends = self._backends.values()
 
         if name:
@@ -30,7 +31,7 @@ class AcQuantumSingleProvider(BaseProvider):
         return backends
 
     def _discover_remote_backends(self):
-        # type: () -> OrderedDict
+        # type: () -> OrderedDict[str, AcQuantumBackend]
 
         ret = OrderedDict()
         configs_list = self._api.available_backends()
@@ -44,7 +45,10 @@ class AcQuantumSingleProvider(BaseProvider):
                     credentials=self.credentials,
                     api=self._api)
             except ValidationError as ex:
-                pass
+                print(
+                    'Remote backend {} could not be instantiated due to an invalid config: {}'
+                        .format(raw_config.get('backend_name', raw_config.get('name', 'unknown')), ex)
+                )
 
         return ret
 
