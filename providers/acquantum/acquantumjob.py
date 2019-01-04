@@ -4,12 +4,15 @@ from enum import Enum
 from typing import Any
 
 from qiskit.providers import BaseJob
+from qiskit.qobj import qobj_to_dict, Qobj
+from qiskit.qobj import validate_qobj_against_schema
+from qiskit.result import Result
 
 from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.acquantumconnector import AcQuantumConnector
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumerrors import AcQuantumJobTimeOutError
-from providers.acquantum.models import AcQuantumResult, AcQuantumRequestError
+from providers.acquantum.models import AcQuantumResult, AcQuantumRequestError, AcQuantumResultResponse
 
 
 class AcQuantumJobStatus(Enum):
@@ -43,7 +46,7 @@ class AcQuantumJob(BaseJob):
     """
 
     def __init__(self, backend: AcQuantumBackend, job_id: str, api: AcQuantumConnector, is_device: bool,
-                 qobj: Any = None,
+                 qobj: Qobj = None,
                  creation_date: Any = None, api_status: AcQuantumJobStatus = None):
         """
         :param backend: The backend instance used to run this job
@@ -62,23 +65,25 @@ class AcQuantumJob(BaseJob):
         if qobj is not None:
             validate_qobj_against_schema(qobj)
 
-        # self._qobj_payload = qobj_to_dict(qobj, version='1.0.0')
-        # TODO: No need for this conversion, just use the new equivalent members above
-        # old_qobj = qobj_to_dict(qobj, version='0.0.1')
-        # self._job_data = {
-        #     'circuits': old_qobj['circuits'],
-        #     'hpc':  old_qobj['config'].get('hpc'),
-        #     'seed': old_qobj['circuits'][0]['config']['seed'],
-        #     'shots': old_qobj['config']['shots'],
-        #     'max_credits': old_qobj['config']['max_credits']
-        # }
-        # else:
-        #     self._qobj_payload = {}
+            self._qobj_payload = qobj_to_dict(qobj, version='1.0.0')
+            # TODO: No need for this conversion, just use the new equivalent members above
+            old_qobj = qobj_to_dict(qobj, version='0.0.1')
+            self._job_data = {
+                'circuits': old_qobj['circuits'],
+                'hpc': old_qobj['config'].get('hpc'),
+                'seed': old_qobj['circuits'][0]['config']['seed'],
+                'shots': old_qobj['config']['shots'],
+                'max_credits': old_qobj['config']['max_credits']
+            }
+        else:
+            self._qobj_payload = {}
 
         self._api = api
         self._backend = backend
         self._cancelled = False
         self._status = AcQuantumJobStatus.INIT
+        # In case of not providing a `qobj`, it is assumed the job already
+        # exists in the API (with `job_id`).
 
         if qobj is None:
             # Some API calls (`get_status_jobs`, `get_status_job`) provide
@@ -102,7 +107,6 @@ class AcQuantumJob(BaseJob):
             datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc).isoformat()
 
         self._creation_date = creation_date or current_utc_time()
-        self._future = None
         self._api_error_msg = None
 
     def job_id(self):
@@ -111,7 +115,7 @@ class AcQuantumJob(BaseJob):
 
     def submit(self) -> None:
         try:
-            job_id = self._api.create_experiment()  # TODO CREATE EXPERIMENT
+            job_id = self._api.create_experiment(None, None, self._generate_job_name())  # TODO CREATE EXPERIMENT
             self._job_id = str(job_id)
             self._api.update_experiment(int(self._job_id), None)  # TODO HANDLE INPUT
             self._api.run_experiment(self._job_id, None, )  # TODO HANDLE INPUT
@@ -138,25 +142,25 @@ class AcQuantumJob(BaseJob):
         Return the result from the job.
         :param timeout: number of seconds to wait for job
         :param wait: time between queries to Alibaba Computing Quantum
-        :return: TODO: generate qiskit.Result
+        :return: qiskit.Result
         """
-        job_response = self._wait_for_result(timeout=timeout, wait=5)
+        job_response: AcQuantumResultResponse = self._wait_for_result(timeout=timeout, wait=5)
         return self._result_from_job_response(job_response)
 
-    def _wait_for_result(self, timeout=None, wait=5):
+    def _wait_for_result(self, timeout=None, wait=5) -> AcQuantumResultResponse:
         self._check_for_submission()
         try:
-            job_response = self._wait_for_job(timeout=timeout, wait=wait)
+            job_response: AcQuantumResultResponse = self._wait_for_job(timeout=timeout, wait=wait)
             if not self._qobj_payload:
-                self._qobj_payload = job_response.get('qObject', {})
+                self._qobj_payload = job_response.get('qObject', {})  # TODO: Convert AcQuantumResultResponse to Qobj
         except AcQuantumRequestError:
-            raise AcQuantumJobError()
+            raise AcQuantumJobError('Result query failed')
         status = self.status()
         if status is not AcQuantumJobStatus.DONE:
             raise AcQuantumJobError('Invalid job state. The job should be DONE but it is {}'.format(str(status)))
         return job_response
 
-    def _wait_for_job(self, timeout: int, wait: int):
+    def _wait_for_job(self, timeout: int, wait: int) -> AcQuantumResultResponse:
         start_time = time.time()
         while self.status() not in JOB_FINAL_STATES:
             elapsed_time = time.time() - start_time
@@ -205,6 +209,9 @@ class AcQuantumJob(BaseJob):
             raise AcQuantumJobError('Unrecognized answer from server: \n{}'.format(result))
         return self._status
 
+    def _generate_job_name(self) -> str:
+        return 'Qiskit_generated_{}'.format(self._creation_date)
+
     @classmethod
     def _is_job_queued(cls, result: AcQuantumResult) -> (bool, int):
         """Checks whether a job has been queued or not."""
@@ -215,6 +222,6 @@ class AcQuantumJob(BaseJob):
         return is_queued, position
 
     @classmethod
-    def _result_from_job_response(cls, job_response):
-        # TODO: Implement
-        return job_response
+    def _result_from_job_response(cls, job_response: AcQuantumResultResponse) -> Result:
+        # TODO: Implement qiskit.Result
+        return None
