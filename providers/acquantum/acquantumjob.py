@@ -6,13 +6,10 @@ from typing import Any
 from qiskit.providers import BaseJob
 from qiskit.qobj import qobj_to_dict, Qobj
 from qiskit.qobj import validate_qobj_against_schema
-from qiskit.result import Result
 
-from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.acquantumconnector import AcQuantumConnector
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumerrors import AcQuantumJobTimeOutError
-from providers.acquantum.models import AcQuantumResult, AcQuantumRequestError, AcQuantumResultResponse
+from providers.acquantum.models import AcQuantumRequestError
 
 
 class AcQuantumJobStatus(Enum):
@@ -45,9 +42,8 @@ class AcQuantumJob(BaseJob):
             job.submit() # will block!
     """
 
-    def __init__(self, backend: AcQuantumBackend, job_id: str, api: AcQuantumConnector, is_device: bool,
-                 qobj: Qobj = None,
-                 creation_date: Any = None, api_status: AcQuantumJobStatus = None):
+    def __init__(self, backend, job_id, api, is_device, qobj=None, creation_date=None, api_status=None):
+        # type: (AcQuantumBackend, str, AcQuantumConnector, bool, Qobj, Any, AcQuantumJobStatus) -> None
         """
         :param backend: The backend instance used to run this job
         :param job_id: The job ID of an already submitted job
@@ -113,7 +109,7 @@ class AcQuantumJob(BaseJob):
         self._check_for_submission()
         return self._job_id
 
-    def submit(self) -> None:
+    def submit(self):
         try:
             job_id = self._api.create_experiment(None, None, self._generate_job_name())  # TODO CREATE EXPERIMENT
             self._job_id = str(job_id)
@@ -123,7 +119,8 @@ class AcQuantumJob(BaseJob):
             # TODO: handle error
             pass
 
-    def cancel(self) -> bool:
+    def cancel(self):
+        # type: () -> bool
         """
         THIS METHOD DELETES THE JOB
         JOB CANCELING IS NOT IMPLEMENTED YET
@@ -138,19 +135,21 @@ class AcQuantumJob(BaseJob):
             raise AcQuantumJobError('Error canceling job: {}'.format(ex.message))
 
     def result(self, timeout=None, wait=5):
+        # type: (int, int) -> qiskit.Result
         """
         Return the result from the job.
         :param timeout: number of seconds to wait for job
         :param wait: time between queries to Alibaba Computing Quantum
         :return: qiskit.Result
         """
-        job_response: AcQuantumResultResponse = self._wait_for_result(timeout=timeout, wait=5)
+        job_response = self._wait_for_result(timeout=timeout, wait=5)
         return self._result_from_job_response(job_response)
 
-    def _wait_for_result(self, timeout=None, wait=5) -> AcQuantumResultResponse:
+    def _wait_for_result(self, timeout=None, wait=5):
+        # type: (int, int) -> AcQuantumResultResponse
         self._check_for_submission()
         try:
-            job_response: AcQuantumResultResponse = self._wait_for_job(timeout=timeout, wait=wait)
+            job_response = self._wait_for_job(timeout=timeout, wait=wait)
             if not self._qobj_payload:
                 self._qobj_payload = job_response.get('qObject', {})  # TODO: Convert AcQuantumResultResponse to Qobj
         except AcQuantumRequestError:
@@ -160,7 +159,8 @@ class AcQuantumJob(BaseJob):
             raise AcQuantumJobError('Invalid job state. The job should be DONE but it is {}'.format(str(status)))
         return job_response
 
-    def _wait_for_job(self, timeout: int, wait: int) -> AcQuantumResultResponse:
+    def _wait_for_job(self, timeout, wait):
+        # type: (int, int) -> AcQuantumResultResponse
         start_time = time.time()
         while self.status() not in JOB_FINAL_STATES:
             elapsed_time = time.time() - start_time
@@ -180,14 +180,15 @@ class AcQuantumJob(BaseJob):
         if self._job_id is None:
             raise AcQuantumJobError('You have to submit before asking status or results')
 
-    def status(self) -> AcQuantumJobStatus:
+    def status(self):
+        # type: () -> AcQuantumJobStatus
         """
         Query the Api to update the status of the job
         :return: The status of the job, once updated
         :raises: AcQuantumJobError: if there was an unknown answer from the server
         """
         try:
-            result: AcQuantumResult = self._api.get_result(experiment_id=int(self._job_id)).get_result()
+            result = self._api.get_result(experiment_id=int(self._job_id)).get_result()
         except AcQuantumRequestError as e:
             self._status = AcQuantumJobStatus.ERROR
             return self._status
@@ -209,11 +210,13 @@ class AcQuantumJob(BaseJob):
             raise AcQuantumJobError('Unrecognized answer from server: \n{}'.format(result))
         return self._status
 
-    def _generate_job_name(self) -> str:
+    def _generate_job_name(self):
+        # type: () -> str
         return 'Qiskit_generated_{}'.format(self._creation_date)
 
     @classmethod
-    def _is_job_queued(cls, result: AcQuantumResult) -> (bool, int):
+    def _is_job_queued(cls, result):
+        # type: (AcQuantumResult) -> (bool, int)
         """Checks whether a job has been queued or not."""
         is_queued, position = False, 0
         if not result.finish_time:
@@ -222,6 +225,7 @@ class AcQuantumJob(BaseJob):
         return is_queued, position
 
     @classmethod
-    def _result_from_job_response(cls, job_response: AcQuantumResultResponse) -> Result:
+    def _result_from_job_response(cls, job_response):
+        # type: (AcQuantumResultResponse) -> qiskit.Result
         # TODO: Implement qiskit.Result
         return None

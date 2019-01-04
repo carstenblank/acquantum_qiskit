@@ -5,7 +5,6 @@ from qiskit.providers import BaseProvider
 
 from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.acquantumconnector import AcQuantumConnector, AcQuantumCredentials
-from providers.acquantum.acquantumprovider import AcQuantumProvider
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 
 

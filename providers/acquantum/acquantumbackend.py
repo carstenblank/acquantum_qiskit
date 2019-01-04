@@ -3,7 +3,6 @@ from qiskit.providers import BaseBackend
 from providers.acquantum.acquantumconnector import AcQuantumConnector
 from providers.acquantum.acquantumerrors import AcQuantumError, AcQuantumBackendError
 from providers.acquantum.acquantumjob import AcQuantumJob
-from providers.acquantum.acquantumprovider import AcQuantumProvider
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 from providers.acquantum.credentials import AcQuantumCredentials
 from providers.acquantum.models.Model import AcQuantumExperimentType, AcQuantumRequestError
@@ -11,8 +10,8 @@ from providers.acquantum.models.Model import AcQuantumExperimentType, AcQuantumR
 
 class AcQuantumBackend(BaseBackend):
 
-    def __init__(self, configuration: AcQuantumBackendConfiguration, provider: AcQuantumProvider,
-                 credentials: AcQuantumCredentials, api: AcQuantumConnector):
+    def __init__(self, configuration, provider, credentials, api):
+        # type: (AcQuantumBackendConfiguration, AcQuantumProvider, AcQuantumCredentials, AcQuantumConnector) -> None
         """
         :param configuration: configuration of backend
         :param provider:
@@ -28,7 +27,8 @@ class AcQuantumBackend(BaseBackend):
         except KeyError:
             raise AcQuantumError('Unknown Backend Name')
 
-    def run(self, qobj) -> AcQuantumJob:
+    def run(self, qobj):
+        # type: (qiskit.Qobj) -> AcQuantumJob
         """Run qobj
 
         Args:
@@ -49,7 +49,8 @@ class AcQuantumBackend(BaseBackend):
         # TODO: Implement backend status
         pass
 
-    def jobs(self, limit: int = 50, skip: int = 0) -> list[AcQuantumJob]:
+    def jobs(self, limit=50, skip=0):
+        # type: (int, int) -> [AcQuantumJob]
         """
 
         :param limit: number of jobs to retrieve
@@ -71,7 +72,8 @@ class AcQuantumBackend(BaseBackend):
 
         return jobs[:limit]
 
-    def retrieve_job(self, job_id) -> AcQuantumJob:
+    def retrieve_job(self, job_id):
+        # type: (str) -> AcQuantumJob
         """
         :param job_id: job id of the job to retrieve
         :return: job: AcQuantum Job
@@ -84,5 +86,6 @@ class AcQuantumBackend(BaseBackend):
 
         return AcQuantumJob(self, response.detail.experiment_id, self._api, self._is_device())
 
-    def _is_device(self) -> bool:
+    def _is_device(self):
+        # type: () -> bool
         return not bool(self.configuration().simulator)
