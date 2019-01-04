@@ -46,7 +46,7 @@ class AcQuantumResponse:
         return 'AcResponse: {{ success: {}, exception: {} }}'.format(self.success, self.exception)
 
 
-class AcQuantumErrorResponse(object, AcQuantumResponse):
+class AcQuantumErrorResponse(AcQuantumResponse):
 
     def __init__(self, success=False, exception=None, status_code=None):
         # type: (bool, Any, int) -> None
