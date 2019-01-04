@@ -4,6 +4,7 @@ from typing import Any
 
 import requests
 
+from providers.acquantum.backendconfiguration import AcQuantumGateConfig
 from providers.acquantum.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.models.Gates import Gate
 from providers.acquantum.models.Model import AcQuantumResponse, AcQuantumExperiment, \
@@ -191,7 +192,43 @@ class AcQuantumConnector(object):
 
     def available_backends(self) -> [str]:
         # TODO: implement
-        return ['SIMULATE', 'REAL']
+        # name (str): the gate name as it will be referred to in QASM.
+        # parameters (list[str]): variable names for the gate parameters (if any).
+        # qasm_def (str): definition of this gate in terms of QASM primitives U
+        # and CX.
+        # MOCKING
+        return [
+            {
+                'backend_name': 'REAL',
+                'backend_version': '0.0.1',
+                'n_qubits': 11,
+                'basis_gates': ['XGate'],
+                'gates': [
+                    AcQuantumGateConfig('XGate', list('param1'), 'qasm_def')
+                ],
+                'local': False,
+                'simulator': False,
+                'conditional': False,
+                'open_pulse': False,
+                'memory': False,
+                'max_shots': 20000
+            },
+            {
+                'backend_name': 'SIMULATE',
+                'backend_version': '0.0.1',
+                'n_qubits': 25,
+                'basis_gates': ['XGate'],
+                'gates': [
+                    AcQuantumGateConfig('XGate', ['param1'], 'qasm_def')
+                ],
+                'local': False,
+                'simulator': True,
+                'conditional': False,
+                'open_pulse': False,
+                'memory': False,
+                'max_shots': 8192
+            }
+        ]
 
     @classmethod
     def handle_ac_response(cls, response: requests.Response) -> AcQuantumResponse:
