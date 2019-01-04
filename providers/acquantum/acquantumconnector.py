@@ -11,11 +11,6 @@ from providers.acquantum.models.Model import AcQuantumResponse, AcQuantumExperim
     AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumResult, AcQuantumResultResponse
 
 
-class AcQuantumExperimentType(object):
-    SIMULATE = 'SIMULATE'
-    REAL = 'REAL'
-
-
 class AcQuantumSession(object):
 
     def __init__(self, csrf: str, cookies: Any, credentials: AcQuantumCredentials) -> None:
