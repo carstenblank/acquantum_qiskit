@@ -194,6 +194,28 @@ class AcQuantumConnector(object):
         # MOCKING
         return [
             {
+                'backend_name': 'SIMULATE',
+                'backend_version': '0.0.1',
+                'n_qubits': 25,
+                'basis_gates': ['XGate'],
+                'gates': [
+                    {'name': 'u1', 'parameters': ['lambda'], 'qasm_def': 'gate u1(lambda) q { U(0,0,lambda) q; }'},
+                    {'name': 'u2', 'parameters': ['phi', 'lambda'],
+                     'qasm_def': 'gate u2(phi,lambda) q { U(pi/2,phi,lambda) q; }'},
+                    {'name': 'u3', 'parameters': ['theta', 'phi', 'lambda'],
+                     'qasm_def': 'gate u3(theta,phi,lambda) q { U(theta,phi,lambda) q; }'},
+                    {'name': 'cx', 'parameters': ['c', 't'], 'qasm_def': 'gate cx c,t { CX c,t; }'},
+                    {'name': 'id', 'parameters': ['a'], 'qasm_def': 'gate id a { U(0,0,0) a; }'},
+                    {'name': 'snapshot', 'parameters': ['slot'], 'qasm_def': 'gate snapshot(slot) q { TODO }'}
+                ],
+                'local': False,
+                'simulator': True,
+                'conditional': False,
+                'open_pulse': False,
+                'memory': False,
+                'max_shots': 8192
+            },
+            {
                 'backend_name': 'REAL',
                 'backend_version': '0.0.1',
                 'n_qubits': 11,
@@ -209,25 +231,6 @@ class AcQuantumConnector(object):
                 'open_pulse': False,
                 'memory': False,
                 'max_shots': 20000
-            },
-            {
-                'backend_name': 'SIMULATE',
-                'backend_version': '0.0.1',
-                'n_qubits': 25,
-                'basis_gates': ['XGate'],
-                'gates': [
-                    {
-                        'name': 'x',
-                        'parameters': [''],
-                        'qasm_def': ''
-                    }
-                ],
-                'local': False,
-                'simulator': True,
-                'conditional': False,
-                'open_pulse': False,
-                'memory': False,
-                'max_shots': 8192
             }
         ]
 
