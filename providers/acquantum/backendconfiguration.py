@@ -28,6 +28,8 @@ class AcQuantumBackendConfigurationSchema(BaseSchema):
 
     # Required properties.
     backend_name = String(required=True)
+    backend_version = String(required=True,
+                             validate=Regexp("[0-9]+.[0-9]+.[0-9]+$"))
     n_qubits = Integer(required=True, validate=Range(min=1))
     basis_gates = List(String(), required=True,
                        validate=Length(min=1))
