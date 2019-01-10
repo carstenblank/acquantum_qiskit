@@ -31,8 +31,8 @@ class AcQuantumProvider(BaseProvider):
         # Aggregate the list of filtered backends.
         backends = []
         for provider in providers:
-            backends = backends + provider.backends(
-                name=name, filters=filters, **kwargs)
+            backends = backends + list(provider.backends(
+                name=name, filters=filters, **kwargs))
 
         return backends
 
