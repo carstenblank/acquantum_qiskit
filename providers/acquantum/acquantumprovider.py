@@ -4,6 +4,7 @@ from typing import Callable
 
 from qiskit.providers import BaseProvider
 
+from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.acquantumerrors import AcQuantumAccountError
 from providers.acquantum.acquantumsingleprovider import AcQuantumSingleProvider
 from providers.acquantum.credentials import discover_credentials, AcQuantumCredentials
@@ -16,8 +17,9 @@ class AcQuantumProvider(BaseProvider):
 
         self._accounts = OrderedDict()
 
-    def backends(self, name: str = None, filters: Callable = None, **kwargs):
-        # TODO: add typings
+    def backends(self, name=None, filters=None, **kwargs):
+        # type: (str, Callable, dict) -> [AcQuantumBackend]
+
         # credentials_filter = {}
         # for key in ['token', 'url', 'hub', 'group', 'project', 'proxies', 'verify']:
         #     if key in kwargs:

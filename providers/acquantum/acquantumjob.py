@@ -43,7 +43,7 @@ class AcQuantumJob(BaseJob):
     """
 
     def __init__(self, backend, job_id, api, is_device, qobj=None, creation_date=None, api_status=None):
-        # type: (AcQuantumBackend, str, AcQuantumConnector, bool, Qobj, Any, AcQuantumJobStatus) -> None
+        # type: ('AcQuantumBackend', str, 'AcQuantumConnector', bool, Qobj, Any, AcQuantumJobStatus) -> None
         """
         :param backend: The backend instance used to run this job
         :param job_id: The job ID of an already submitted job
@@ -113,11 +113,10 @@ class AcQuantumJob(BaseJob):
         try:
             job_id = self._api.create_experiment(None, None, self._generate_job_name())  # TODO CREATE EXPERIMENT
             self._job_id = str(job_id)
-            self._api.update_experiment(int(self._job_id), None)  # TODO HANDLE INPUT
-            self._api.run_experiment(self._job_id, None, )  # TODO HANDLE INPUT
+            self._api.update_experiment(int(self._job_id), )  # TODO HANDLE INPUT
+            self._api.run_experiment(self._job_id, None)  # TODO HANDLE INPUT
         except AcQuantumRequestError as e:
-            # TODO: handle error
-            pass
+            raise AcQuantumJobError(e.message)
 
     def cancel(self):
         # type: () -> bool
@@ -193,10 +192,7 @@ class AcQuantumJob(BaseJob):
             self._status = AcQuantumJobStatus.ERROR
             return self._status
 
-        # TODO: Add Validating Status
         # TODO: Add Cancelled Status
-        # TODO: Add Error Status
-
         if not result.finish_time:
             self._status = AcQuantumJobStatus.RUNNING
             queued, self._queue_position = self._is_job_queued(result)

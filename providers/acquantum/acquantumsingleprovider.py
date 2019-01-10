@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import OrderedDict, _OrderedDictItemsView
 
 from jsonschema import ValidationError
 from qiskit.providers import BaseProvider
@@ -11,7 +11,7 @@ from providers.acquantum.backendconfiguration import AcQuantumBackendConfigurati
 class AcQuantumSingleProvider(BaseProvider):
 
     def __init__(self, credentials, provider):
-        # type: (AcQuantumCredentials, AcQuantumProvider) -> None
+        # type: (AcQuantumCredentials, 'AcQuantumProvider') -> None
         super().__init__()
 
         self._ac_provider = provider
@@ -21,7 +21,8 @@ class AcQuantumSingleProvider(BaseProvider):
         self._backends = self._discover_remote_backends()
 
     def backends(self, name=None, **kwargs):
-        # TODO: add typings
+        # type: (str, dict) -> _OrderedDictItemsView
+
         # TODO: implement
         backends = self._backends.values()
 
