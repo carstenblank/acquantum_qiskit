@@ -1,10 +1,10 @@
-from marshmallow.fields import String, Integer, List, Nested, DateTime, Boolean
-from marshmallow.validate import Range, Length, OneOf, Equal
+from marshmallow.fields import String, Integer, List, DateTime, Boolean
+from marshmallow.validate import Range, Length, OneOf, Equal, Regexp
 from qiskit.validation import BaseModel, BaseSchema, bind_schema
 
 
 class AcQuantumGateConfigSchema(BaseSchema):
-    """Schema for GateConfig."""
+    """Schema for AcQuantumGateConfig."""
 
     # Required properties.
     name = String(required=True)
@@ -24,15 +24,15 @@ class AcQuantumGateConfigSchema(BaseSchema):
 
 
 class AcQuantumBackendConfigurationSchema(BaseSchema):
-    """Schema for BackendConfiguration."""
+    """Schema for AcQuantumBackendConfiguration."""
 
     # Required properties.
     backend_name = String(required=True)
     n_qubits = Integer(required=True, validate=Range(min=1))
     basis_gates = List(String(), required=True,
                        validate=Length(min=1))
-    gates = Nested(AcQuantumGateConfigSchema, required=True, many=True,
-                   validate=Length(min=1))
+    # gates = Nested(AcQuantumGateConfigSchema, required=True, many=True,
+    #                validate=Length(min=1))
     local = Boolean(required=True)
     simulator = Boolean(required=True)
     conditional = Boolean(required=True)
@@ -63,7 +63,7 @@ class AcQuantumBackendConfiguration(BaseModel):
     """Model for BackendConfiguration.
 
     Please note that this class only describes the required fields. For the
-    full description of the model, please check ``BackendConfigurationSchema``.
+    full description of the model, please check ``AcQuantumBackendConfigurationSchema``.
     Attributes:
         backend_name (str): backend name.
         backend_version (str): backend version in the form X.Y.Z.
@@ -80,6 +80,8 @@ class AcQuantumBackendConfiguration(BaseModel):
 
     def __init__(self, backend_name, backend_version, n_qubits, basis_gates, gates, local, simulator, conditional,
                  open_pulse, memory, max_shots, **kwargs):
+        # type: (str, str, int, [str], 'AcQuantumGateConfig', bool, bool , bool, bool, bool, int, dict) -> None
+
         super().__init__(**kwargs)
         self.backend_name = backend_name
         self.backend_version = backend_version
@@ -96,10 +98,10 @@ class AcQuantumBackendConfiguration(BaseModel):
 
 @bind_schema(AcQuantumGateConfigSchema)
 class AcQuantumGateConfig(BaseModel):
-    """Model for GateConfig.
+    """Model for AcQuantumGateConfig.
 
     Please note that this class only describes the required fields. For the
-    full description of the model, please check ``GateConfigSchema``.
+    full description of the model, please check ``AcQuantumGateConfigSchema``.
 
     Attributes:
         name (str): the gate name as it will be referred to in QASM.
@@ -109,6 +111,7 @@ class AcQuantumGateConfig(BaseModel):
     """
 
     def __init__(self, name, parameters, qasm_def, **kwargs):
+        # type: (str, [str], str, dict) -> None
         self.name = name
         self.parameters = parameters
         self.qasm_def = qasm_def
