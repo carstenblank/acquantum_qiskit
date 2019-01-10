@@ -77,7 +77,7 @@ class AcQuantumJob(BaseJob):
         self._api = api
         self._backend = backend
         self._cancelled = False
-        self._status = AcQuantumJobStatus.INIT
+        self._status = AcQuantumJobStatus.INITIALIZING
         # In case of not providing a `qobj`, it is assumed the job already
         # exists in the API (with `job_id`).
 
