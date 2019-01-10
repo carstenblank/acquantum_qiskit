@@ -24,7 +24,7 @@ class AcQuantumSingleProvider(BaseProvider):
         # type: (str, dict) -> _OrderedDictItemsView
 
         # TODO: implement
-        backends = self._backends.values()
+        backends = self._backends.items()
 
         if name:
             kwargs['backend_name'] = name
