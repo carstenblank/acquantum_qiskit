@@ -67,7 +67,7 @@ class AcQuantumErrorResponse(AcQuantumResponse):
 class AcQuantumExperimentDetail:
 
     def __init__(self, name, version, experiment_id, experiment_type, execution, bit_width=None):
-        # type: (str, int, int, str, int, int) -> None
+        # type: (str, int, int, AcQuantumExperimentType, int, int) -> None
         self.name = name
         self.version = version
         self.experiment_id = experiment_id
