@@ -219,7 +219,7 @@ class AcQuantumJob(BaseJob):
         is_queued, position = False, 0
         if not result.finish_time:
             is_queued = True
-            position = result[1:-1]
+            position = result.process[1:-1]  # TODO CHECK ATTRIBUTE
         return is_queued, position
 
     def get_queue_position(self):
