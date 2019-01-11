@@ -8,7 +8,8 @@ from providers.acquantum.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.models.Gates import Gate
 from providers.acquantum.models.Model import AcQuantumResponse, AcQuantumExperiment, \
     AcQuantumExperimentDetail, \
-    AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumResult, AcQuantumResultResponse
+    AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumResult, AcQuantumResultResponse, \
+    AcQuantumBackendType
 
 
 class AcQuantumSession(object):
@@ -74,13 +75,15 @@ class AcQuantumConnector(object):
 
         return self._req.post(uri, data=payload, params=params, headers=headers)
 
-    def create_experiment(self, bit_width: int, experiment_type: str, experiment_name: str) -> int:
+    def create_experiment(self, bit_width, experiment_type, experiment_name):
+        # type: (int, AcQuantumBackendType, str) -> int
+
         uri = '{}/experiment/infosave'.format(self._base_uri)
         params = {self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1]}
         headers = {self._TOKEN_HEADER_KEY: self._session.csrf, 'Content-Type': 'application/json'}
         payload = {
             'bitWidth': bit_width,
-            'type': experiment_type,
+            'type': experiment_type.name,
             'name': experiment_name
         }
         response = self.handle_ac_response(self._req.post(uri, params=params, headers=headers, json=payload))
@@ -139,14 +142,16 @@ class AcQuantumConnector(object):
                                       exp['execution']) for exp in body]
         return experiment_list
 
-    def run_experiment(self, experiment_id: int, experiment_type: str, bit_width: int, shots: int, seed: str = None):
+    def run_experiment(self, experiment_id, experiment_type, bit_width, shots, seed=None):
+        # type: (int, AcQuantumBackendType, int, int, str) -> None
+
         uri = '{}/experiment/submit'.format(self._base_uri)
         headers = {'Content-Type': 'application/json', self._TOKEN_HEADER_KEY: self._session.csrf}
         params = {
             self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1],
             'experimentId': experiment_id,
             'bitWidth': bit_width,
-            'type': experiment_type,
+            'type': experiment_type.name,
             'shots': shots,
             'seed': seed if seed else ''
         }

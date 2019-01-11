@@ -2,7 +2,7 @@ from enum import Enum
 from typing import Any
 
 
-class AcQuantumExperimentType(Enum):
+class AcQuantumBackendType(Enum):
     REAL = 'REAL',
     SIMULATE = 'SIMULATE'
 
@@ -67,7 +67,7 @@ class AcQuantumErrorResponse(AcQuantumResponse):
 class AcQuantumExperimentDetail:
 
     def __init__(self, name, version, experiment_id, experiment_type, execution, bit_width=None):
-        # type: (str, int, int, AcQuantumExperimentType, int, int) -> None
+        # type: (str, int, int, AcQuantumBackendType, int, int) -> None
         self.name = name
         self.version = version
         self.experiment_id = experiment_id

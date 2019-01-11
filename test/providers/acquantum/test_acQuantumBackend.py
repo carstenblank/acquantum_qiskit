@@ -5,7 +5,7 @@ from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 from providers.acquantum.credentials import AcQuantumCredentials
 from providers.acquantum.models import AcQuantumExperimentDetail
-from providers.acquantum.models.Model import AcQuantumExperimentType
+from providers.acquantum.models.Model import AcQuantumBackendType
 
 
 class TestAcQuantumBackend(TestCase):
@@ -21,7 +21,7 @@ class TestAcQuantumBackend(TestCase):
 
     def test_jobs(self):
         api_mock = Mock()
-        jobs = [AcQuantumExperimentDetail('test', 1, 123, AcQuantumExperimentType.SIMULATE, 0, 11)]
+        jobs = [AcQuantumExperimentDetail('test', 1, 123, AcQuantumBackendType.SIMULATE, 0, 11)]
         backend_config = {
             'backend_name': 'SIMULATE',
             'backend_version': '0.0.1',

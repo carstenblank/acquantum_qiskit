@@ -5,7 +5,7 @@ from providers.acquantum.acquantumerrors import AcQuantumError, AcQuantumBackend
 from providers.acquantum.acquantumjob import AcQuantumJob
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 from providers.acquantum.credentials import AcQuantumCredentials
-from providers.acquantum.models.Model import AcQuantumExperimentType, AcQuantumRequestError
+from providers.acquantum.models.Model import AcQuantumBackendType, AcQuantumRequestError
 
 
 class AcQuantumBackend(BaseBackend):
@@ -23,7 +23,7 @@ class AcQuantumBackend(BaseBackend):
         self._api = api
         self._credentials = credentials
         try:
-            self._backend_type = AcQuantumExperimentType[configuration.backend_name]
+            self._backend_type = AcQuantumBackendType[configuration.backend_name]
         except KeyError:
             raise AcQuantumError('Unknown Backend Name')
 
