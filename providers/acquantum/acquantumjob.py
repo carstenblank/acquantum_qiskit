@@ -58,7 +58,7 @@ class AcQuantumJob(BaseJob):
         super().__init__(backend, job_id)
 
         if qobj is not None:
-            validate_qobj_against_schema(qobj)
+            # validate_qobj_against_schema(qobj)
             self._qobj = qobj
 
         self._api = api
