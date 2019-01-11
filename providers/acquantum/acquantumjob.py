@@ -5,7 +5,6 @@ from typing import Any
 
 from qiskit.providers import BaseJob
 from qiskit.qobj import Qobj
-from qiskit.qobj import validate_qobj_against_schema
 
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumerrors import AcQuantumJobTimeOutError
@@ -222,6 +221,9 @@ class AcQuantumJob(BaseJob):
             is_queued = True
             position = result[1:-1]
         return is_queued, position
+
+    def get_queue_position(self):
+        return self._queue_position
 
     @classmethod
     def _result_from_job_response(cls, job_response):
