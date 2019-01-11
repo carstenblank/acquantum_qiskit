@@ -4,7 +4,7 @@ from enum import Enum
 from typing import Any
 
 from qiskit.providers import BaseJob
-from qiskit.qobj import qobj_to_dict, Qobj
+from qiskit.qobj import Qobj
 from qiskit.qobj import validate_qobj_against_schema
 
 from providers.acquantum.acquantumerrors import AcQuantumJobError
@@ -42,8 +42,8 @@ class AcQuantumJob(BaseJob):
             job.submit() # will block!
     """
 
-    def __init__(self, backend, job_id, api, is_device, qobj=None, creation_date=None, api_status=None):
-        # type: ('AcQuantumBackend', str, 'AcQuantumConnector', bool, Qobj, Any, AcQuantumJobStatus) -> None
+    def __init__(self, backend, job_id, api, is_device, qobj=None, creation_date=None, api_status=None, job_name=None):
+        # type: ('AcQuantumBackend', str, 'AcQuantumConnector', bool, Qobj, Any, AcQuantumJobStatus, str) -> None
         """
         :param backend: The backend instance used to run this job
         :param job_id: The job ID of an already submitted job
@@ -78,6 +78,7 @@ class AcQuantumJob(BaseJob):
         self._backend = backend
         self._cancelled = False
         self._status = AcQuantumJobStatus.INITIALIZING
+        self._job_name = job_name
         # In case of not providing a `qobj`, it is assumed the job already
         # exists in the API (with `job_id`).
 

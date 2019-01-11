@@ -27,17 +27,18 @@ class AcQuantumBackend(BaseBackend):
         except KeyError:
             raise AcQuantumError('Unknown Backend Name')
 
-    def run(self, qobj):
-        # type: (qiskit.Qobj) -> AcQuantumJob
+    def run(self, qobj, job_name=None):
+        # type: (qiskit.Qobj, str) -> AcQuantumJob
         """Run qobj
 
         Args:
-            qobj (dict): description of job
+            qobj (Qobj): description of job
+            job_name (str): job name
 
         Returns:
             AcQuantumJob: an instance derived from BaseJob
         """
-        job = AcQuantumJob(self, None, self._api, not self.configuration().simulator, qobj=qobj)
+        job = AcQuantumJob(self, None, self._api, not self.configuration().simulator, qobj=qobj, job_name=job_name)
         job.submit()
         return job
 
@@ -65,7 +66,7 @@ class AcQuantumBackend(BaseBackend):
 
         for job in job_info_list:
             if job.experiment_type is self._backend_type:
-                jobs.append(AcQuantumJob(self, job.experiment_id, self._api, self._is_device()))
+                jobs.append(AcQuantumJob(self, job.experiment_id, self._api, self._is_device(), job_name=job.name))
 
         if skip:
             jobs = jobs[skip:]
@@ -84,7 +85,8 @@ class AcQuantumBackend(BaseBackend):
         except AcQuantumRequestError as ex:
             raise AcQuantumBackendError('Failed to get job "{}" {}'.format(job_id, str(ex)))
 
-        return AcQuantumJob(self, response.detail.experiment_id, self._api, self._is_device())
+        return AcQuantumJob(self, response.detail.experiment_id, self._api, self._is_device(),
+                            job_name=response.detail.name)
 
     def _is_device(self):
         # type: () -> bool
