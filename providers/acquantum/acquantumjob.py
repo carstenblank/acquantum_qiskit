@@ -200,10 +200,10 @@ class AcQuantumJob(BaseJob):
             queued, self._queue_position = self._is_job_queued(result)
             if queued:
                 self._status = AcQuantumJobStatus.QUEUED
-        elif result.finish_time:
-            self._status = AcQuantumJobStatus.DONE
         elif result.exception:
             self._status = AcQuantumJobStatus.ERROR
+        elif result.finish_time:
+            self._status = AcQuantumJobStatus.DONE
         else:
             raise AcQuantumJobError('Unrecognized answer from server: \n{}'.format(result))
         return self._status
