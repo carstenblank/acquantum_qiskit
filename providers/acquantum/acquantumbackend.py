@@ -48,7 +48,8 @@ class AcQuantumBackend(BaseBackend):
 
     def status(self):
         # TODO: Implement backend status
-        pass
+        if self._is_device():
+            res = self._api.get_backend_config()
 
     def jobs(self, limit=50, skip=0):
         # type: (int, int) -> [AcQuantumJob]

@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from enum import Enum
 from typing import Any
 
@@ -152,3 +153,87 @@ class AcQuantumResult:
                'finish_time: {}, process: {}, data: {} }} '.format(self.result_id, self.seed, self.shots,
                                                                    self.start_time, self.measure_qubits,
                                                                    self.finish_time, self.process, self.data)
+
+
+class AcQuantumBaseConfig(ABC):
+
+    @abstractmethod
+    def __init__(self, computer_id, config_key, config_value):
+        self.config_value = config_value
+        self.config_key = config_key
+        self.computer_id = computer_id
+
+    @abstractmethod
+    def from_dict(self, values):
+        pass
+
+
+class AcQuantumRawConfig:
+
+    def __init__(self, system_config, one_q_gate_fidelities, qubit_parameter, system_status, two_q_gate_fidelity):
+        self.system_config = system_config
+        self.one_q_gate_fidelities = one_q_gate_fidelities
+        self.qubit_parameter = qubit_parameter
+        self.system_status = system_status
+        self.two_q_gate_fidelity = two_q_gate_fidelity
+
+    @classmethod
+    def from_dict(cls, values):
+        # type: ([dict]) -> AcQuantumRawConfig
+        return AcQuantumRawConfig(*values)
+
+
+class BackendSystemConfig(AcQuantumBaseConfig):
+
+    def __init__(self, computer_id, config_key, config_value):
+        # type: (str, str, dict) -> None
+        super().__init__(computer_id, config_key, config_value)
+
+    @classmethod
+    def from_dict(cls, values):
+        # type: (dict) -> BackendSystemConfig
+        return BackendSystemConfig(values['computerId'], values['configKey'], values['configValue'])
+
+
+class OneQGateFidelities(AcQuantumBaseConfig):
+
+    def __init__(self, computer_id, config_key, config_value):
+        super().__init__(computer_id, config_key, config_value)
+
+    @classmethod
+    def from_dict(cls, values):
+        # type: (dict) -> OneQGateFidelities
+        return OneQGateFidelities(values['computerId'], values['configKey'], values['configValue'])
+
+
+class QubitParameter(AcQuantumBaseConfig):
+
+    def __init__(self, computer_id, config_key, config_value):
+        super().__init__(computer_id, config_key, config_value)
+
+    @classmethod
+    def from_dict(cls, values):
+        # type: (dict) -> QubitParameter
+        return QubitParameter(values['computerId'], values['configKey'], values['configValue'])
+
+
+class SystemStatus(AcQuantumBaseConfig):
+
+    def __init__(self, computer_id, config_key, config_value):
+        super().__init__(computer_id, config_key, config_value)
+
+    @classmethod
+    def from_dict(cls, values):
+        # type: (dict) -> SystemStatus
+        return SystemStatus(values['computerId'], values['configKey'], values['configValue'])
+
+
+class TwoQGateFidelity(AcQuantumBaseConfig):
+
+    def __init__(self, computer_id, config_key, config_value):
+        super().__init__(computer_id, config_key, config_value)
+
+    @classmethod
+    def from_dict(cls, values):
+        # type: (dict) -> TwoQGateFidelity
+        return TwoQGateFidelity(values['computerId'], values['configKey'], values['configValue'])

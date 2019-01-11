@@ -9,7 +9,7 @@ from providers.acquantum.models.Gates import Gate
 from providers.acquantum.models.Model import AcQuantumResponse, AcQuantumExperiment, \
     AcQuantumExperimentDetail, \
     AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumResult, AcQuantumResultResponse, \
-    AcQuantumBackendType
+    AcQuantumBackendType, AcQuantumRawConfig
 
 
 class AcQuantumSession(object):
@@ -213,6 +213,17 @@ class AcQuantumConnector(object):
         }
 
         self.handle_ac_response(self._req.post(uri, headers=headers, params=params))
+
+    def get_backend_config(self):
+        # type: () -> AcQuantumRawConfig
+
+        uri = '{}/computerConfig/query'.format(self._base_uri)
+        headers = {'Content-Type': 'application/json', self._TOKEN_HEADER_KEY: self._session.csrf}
+        params = {
+            self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1]
+        }
+        response = self.handle_ac_response(self._req.get(uri, headers=headers, params=params))
+        return AcQuantumRawConfig.from_dict(response.data)
 
     def available_backends(self):
         # TODO: implement
