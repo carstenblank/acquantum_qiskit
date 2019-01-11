@@ -234,5 +234,5 @@ class AcQuantumJob(BaseJob):
     @classmethod
     def _gates_from_qobj(cls, qobj):
         # type: (Qobj) -> [Gates]
-        # TODO: Implement
+        # TODO: Implement Qobj to Gates
         return []
