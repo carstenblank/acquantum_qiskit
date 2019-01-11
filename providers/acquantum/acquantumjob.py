@@ -154,8 +154,6 @@ class AcQuantumJob(BaseJob):
         self._check_for_submission()
         try:
             job_response = self._wait_for_job(timeout=timeout, wait=wait)
-            if not self._qobj_payload:
-                self._qobj_payload = job_response.get('qObject', {})  # TODO: Convert AcQuantumResultResponse to Qobj
         except AcQuantumRequestError:
             raise AcQuantumJobError('Result query failed')
         status = self.status()
