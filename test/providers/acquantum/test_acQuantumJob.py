@@ -71,23 +71,36 @@ class TestAcQuantumJob(TestCase):
         # TODO: Implement
         pass
 
-    def test__wait_for_result(self):
-        self.fail()
+    def test_status_done(self):
+        api_mock = Mock()
+        api_mock.get_result.return_value = AcQuantumResultResponse(
+            real_result=[AcQuantumResult(result_id=12, seed=100, shots=10, start_time='2019-01-11', measure_qubits=11,
+                                         finish_time='2019-01-08')])
 
-    def test__wait_for_job(self):
-        self.fail()
+        job = AcQuantumJob(None, '100', api_mock, True)
+        status = job.status()
+        self.assertEqual(status, AcQuantumJobStatus.DONE)
 
-    def test__check_for_submission(self):
-        self.fail()
+    def test_status_queued(self):
+        api_mock = Mock()
+        api_mock.get_result.return_value = AcQuantumResultResponse(
+            real_result=[
+                AcQuantumResult(result_id=12, seed=100, shots=10, start_time='', measure_qubits=11, process='c32c')])
 
-    def test_status(self):
-        self.fail()
+        job = AcQuantumJob(None, '100', api_mock, True)
+        status = job.status()
+        self.assertEqual(status, AcQuantumJobStatus.QUEUED)
+        self.assertEqual(job.get_queue_position(), '32')
 
-    def test__generate_job_name(self):
-        self.fail()
+    def test_status_error(self):
+        api_mock = Mock()
+        api_mock.get_result.return_value = AcQuantumResultResponse(
+            real_result=[AcQuantumResult(result_id=12, seed=100, shots=10, start_time='', measure_qubits=11,
+                                         finish_time='2019-01-08', exception='Error')])
 
-    def test__is_job_queued(self):
-        self.fail()
+        job = AcQuantumJob(None, '100', api_mock, True)
+        status = job.status()
+        self.assertEqual(status, AcQuantumJobStatus.ERROR)
 
     def test__result_from_job_response(self):
         # TODO: Implemnt
