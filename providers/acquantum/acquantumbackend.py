@@ -91,3 +91,6 @@ class AcQuantumBackend(BaseBackend):
     def _is_device(self):
         # type: () -> bool
         return not bool(self.configuration().simulator)
+
+    def backend_type(self):
+        return self._backend_type

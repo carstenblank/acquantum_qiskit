@@ -60,19 +60,7 @@ class AcQuantumJob(BaseJob):
 
         if qobj is not None:
             validate_qobj_against_schema(qobj)
-
-            self._qobj_payload = qobj_to_dict(qobj, version='1.0.0')
-            # TODO: No need for this conversion, just use the new equivalent members above
-            old_qobj = qobj_to_dict(qobj, version='0.0.1')
-            self._job_data = {
-                'circuits': old_qobj['circuits'],
-                'hpc': old_qobj['config'].get('hpc'),
-                'seed': old_qobj['circuits'][0]['config']['seed'],
-                'shots': old_qobj['config']['shots'],
-                'max_credits': old_qobj['config']['max_credits']
-            }
-        else:
-            self._qobj_payload = {}
+            self._qobj = qobj
 
         self._api = api
         self._backend = backend
@@ -110,12 +98,28 @@ class AcQuantumJob(BaseJob):
         self._check_for_submission()
         return self._job_id
 
-    def submit(self):
+    def submit(self, n_qubits=None):
+        # type: (int) -> None
+
+        if self._qobj is None:
+            raise AcQuantumJobError('Can not find qobj')
+
+        if n_qubits is None:
+            n_qubits = self._backend.configuration().n_qubits
+
+        backend_type = self._backend.backend_type()
+
+        if self._job_name is None:
+            self._job_name = self._generate_job_name()
         try:
-            job_id = self._api.create_experiment(None, None, self._generate_job_name())  # TODO CREATE EXPERIMENT
+            job_id = self._api.create_experiment(n_qubits, backend_type, self._job_name)
             self._job_id = str(job_id)
-            self._api.update_experiment(int(self._job_id), )  # TODO HANDLE INPUT
-            self._api.run_experiment(self._job_id, None)  # TODO HANDLE INPUT
+
+            gates = self._gates_from_qobj(self._qobj)
+
+            self._api.update_experiment(job_id, gates)
+            self._api.run_experiment(job_id, backend_type, n_qubits, self._qobj.config.shots,
+                                     self._qobj.config.seeds)  # TODO HANDLE INPUT
         except AcQuantumRequestError as e:
             raise AcQuantumJobError(e.message)
 
@@ -226,3 +230,9 @@ class AcQuantumJob(BaseJob):
         # type: (AcQuantumResultResponse) -> qiskit.Result
         # TODO: Implement qiskit.Result
         return None
+
+    @classmethod
+    def _gates_from_qobj(cls, qobj):
+        # type: (Qobj) -> [Gates]
+        # TODO: Implement
+        return []
