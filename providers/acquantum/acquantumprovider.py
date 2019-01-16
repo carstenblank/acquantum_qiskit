@@ -1,6 +1,5 @@
 import warnings
 from collections import OrderedDict
-from typing import Callable
 
 from qiskit.providers import BaseProvider
 
@@ -17,14 +16,13 @@ class AcQuantumProvider(BaseProvider):
 
         self._accounts = OrderedDict()
 
-    def backends(self, name=None, filters=None, **kwargs):
-        # type: (str, Callable, dict) -> [AcQuantumBackend]
-
-        # credentials_filter = {}
-        # for key in ['token', 'url', 'hub', 'group', 'project', 'proxies', 'verify']:
-        #     if key in kwargs:
-        #         credentials_filter[key] = kwargs.pop(key)
-        # TODO FILTER BACKENDS
+    def backends(self, name=None, **kwargs):
+        # type: (str, dict) -> [AcQuantumBackend]
+        """
+        :param name: name of the backend
+        :param kwargs: kwargs for filtering not yet implemented
+        :return:
+        """
 
         providers = [provider for provider in self._accounts.values()]
 
@@ -32,7 +30,7 @@ class AcQuantumProvider(BaseProvider):
         backends = []
         for provider in providers:
             backends = backends + list(provider.backends(
-                name=name, filters=filters, **kwargs))
+                name=name, **kwargs))
 
         return backends
 
