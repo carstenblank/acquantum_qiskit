@@ -64,11 +64,11 @@ class TestAcQuantumJob(TestCase):
         api_mock.run_experiment.assert_called_once_with(job_id, backend_type, n_qubits, shots, None)
 
     def test_cancel(self):
-        # TODO: Implement
+        # TODO: Implement Cancel
         pass
 
     def test_result(self):
-        # TODO: Implement
+        # TODO: Implement Result
         pass
 
     def test_status_done(self):
@@ -103,5 +103,5 @@ class TestAcQuantumJob(TestCase):
         self.assertEqual(status, AcQuantumJobStatus.ERROR)
 
     def test__result_from_job_response(self):
-        # TODO: Implemnt
+        # TODO: Implement Result
         pass
