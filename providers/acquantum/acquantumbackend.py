@@ -1,4 +1,5 @@
 from qiskit.providers import BaseBackend
+from qiskit.qobj import Qobj
 
 from providers.acquantum.acquantumconnector import AcQuantumConnector
 from providers.acquantum.acquantumerrors import AcQuantumError, AcQuantumBackendError
@@ -11,7 +12,7 @@ from providers.acquantum.models.Model import AcQuantumBackendType, AcQuantumRequ
 class AcQuantumBackend(BaseBackend):
 
     def __init__(self, configuration, provider, credentials, api):
-        # type: (AcQuantumBackendConfiguration, AcQuantumProvider, AcQuantumCredentials, AcQuantumConnector) -> None
+        # type: (AcQuantumBackendConfiguration, 'AcQuantumProvider', AcQuantumCredentials, AcQuantumConnector) -> None
         """
         :param configuration: configuration of backend
         :param provider:
@@ -28,16 +29,7 @@ class AcQuantumBackend(BaseBackend):
             raise AcQuantumError('Unknown Backend Name')
 
     def run(self, qobj, job_name=None):
-        # type: (qiskit.Qobj, str) -> AcQuantumJob
-        """Run qobj
-
-        Args:
-            qobj (Qobj): description of job
-            job_name (str): job name
-
-        Returns:
-            AcQuantumJob: an instance derived from BaseJob
-        """
+        # type: (Qobj, str) -> AcQuantumJob
         job = AcQuantumJob(self, None, self._api, not self.configuration().simulator, qobj=qobj, job_name=job_name)
         job.submit()
         return job
@@ -47,9 +39,10 @@ class AcQuantumBackend(BaseBackend):
         pass
 
     def status(self):
-        # TODO: Implement backend status
         if self._is_device():
-            res = self._api.get_backend_config()
+            return self._api.get_backend_config().system_status
+
+        raise AcQuantumBackendError('Could not find status for Simulator')
 
     def jobs(self, limit=50, skip=0):
         # type: (int, int) -> [AcQuantumJob]
