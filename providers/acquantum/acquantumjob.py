@@ -194,7 +194,6 @@ class AcQuantumJob(BaseJob):
             self._status = AcQuantumJobStatus.ERROR
             return self._status
 
-        # TODO: Add Cancelled Status
         if not result.finish_time:
             self._status = AcQuantumJobStatus.RUNNING
             queued, self._queue_position = self._is_job_queued(result)
