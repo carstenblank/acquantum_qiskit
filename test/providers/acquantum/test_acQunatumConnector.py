@@ -7,6 +7,7 @@ from unittest import TestCase
 from providers.acquantum.acquantumconnector import AcQuantumConnector
 from providers.acquantum.credentials import AcQuantumCredentials
 from providers.acquantum.models import AcQuantumRequestForbiddenError, XGate, YGate, CCPhase, Measure
+from providers.acquantum.models.Gates import Gate
 from providers.acquantum.models.Model import AcQuantumBackendType, AcQuantumRequestError
 
 
@@ -52,7 +53,7 @@ class TestAlibabaQuantum(TestCase):
         csrf = self.api._session.csrf
         cookies = self.api._session.cookies
         self.api = AcQuantumConnector()
-        self.api.load_session(AcQuantumCredentials('sebboer', 'qnpwzHyIIFw33Nw2PBx'))
+        self.api.load_session()
         self.assertEqual(self.api._session.csrf, csrf)
         self.assertEqual(self.api._session.cookies, cookies)
 
@@ -197,7 +198,7 @@ class TestAlibabaQuantum(TestCase):
             except AcQuantumRequestError as e:
                 self.fail(e)
 
-    def test_get_backend_status(self):
+    def test_get_backend_config(self):
         config = self.api.get_backend_config()
-        print(config.system_config)
-        print(config.system_status)
+        status = config.system_status.config_value.status
+        self.assertTrue(status in ['ONLINE', 'OFFLINE'])

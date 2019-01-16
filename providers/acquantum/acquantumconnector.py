@@ -200,7 +200,7 @@ class AcQuantumConnector(object):
 
         uri = '{}/login'.format(self._base_uri)
         response = self._req.get(uri)
-        return re.search('[a-f\d]{8}(-[a-f\d]{4}){3}-[a-f\d]{12}?', response.text).group()
+        return re.search('[a-f\\d]{8}(-[a-f\\d]{4}){3}-[a-f\\d]{12}?', response.text).group()
 
     def delete_experiment(self, experiment_id):
         # type: (int) -> None
@@ -223,7 +223,7 @@ class AcQuantumConnector(object):
             self._CHARSET_PARAM[0]: self._CHARSET_PARAM[1]
         }
         response = self.handle_ac_response(self._req.get(uri, headers=headers, params=params))
-        return AcQuantumRawConfig.from_dict(response.data)
+        return AcQuantumRawConfig.from_json(response.data)
 
     def available_backends(self):
         # TODO: implement
