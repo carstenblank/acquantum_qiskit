@@ -22,6 +22,11 @@ class AcQuantumSingleProvider(BaseProvider):
 
     def backends(self, name=None, **kwargs):
         # type: (str, dict) -> _OrderedDictItemsView
+        """
+        :param name:  name of backends
+        :param kwargs:
+        :return:
+        """
 
         backends = self._backends.items()
 
