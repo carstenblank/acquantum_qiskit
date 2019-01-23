@@ -4,14 +4,6 @@ providers.acquantum.credentials package
 Submodules
 ----------
 
-providers.acquantum.credentials.\_env module
---------------------------------------------
-
-.. automodule:: providers.acquantum.credentials._env
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 providers.acquantum.credentials.credentials module
 --------------------------------------------------
 
