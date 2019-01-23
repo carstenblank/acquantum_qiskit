@@ -1,11 +1,6 @@
 providers.acquantum.models package
 ==================================
 
-.. automodule:: providers.acquantum.models
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Submodules
 ----------
 
@@ -26,3 +21,10 @@ providers.acquantum.models.Model module
     :show-inheritance:
 
 
+Module contents
+---------------
+
+.. automodule:: providers.acquantum.models
+    :members:
+    :undoc-members:
+    :show-inheritance:

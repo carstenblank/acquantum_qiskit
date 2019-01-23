@@ -1,11 +1,6 @@
 providers.acquantum package
 ===========================
 
-.. automodule:: providers.acquantum
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -74,3 +69,10 @@ providers.acquantum.backendconfiguration module
     :show-inheritance:
 
 
+Module contents
+---------------
+
+.. automodule:: providers.acquantum
+    :members:
+    :undoc-members:
+    :show-inheritance:

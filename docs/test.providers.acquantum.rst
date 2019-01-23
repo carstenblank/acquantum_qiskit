@@ -1,11 +1,6 @@
 test.providers.acquantum package
 ================================
 
-.. automodule:: test.providers.acquantum
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -57,3 +52,10 @@ test.providers.acquantum.test\_acQunatumConnector module
     :show-inheritance:
 
 
+Module contents
+---------------
+
+.. automodule:: test.providers.acquantum
+    :members:
+    :undoc-members:
+    :show-inheritance:

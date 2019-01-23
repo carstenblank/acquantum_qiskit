@@ -1,11 +1,6 @@
 test package
 ============
 
-.. automodule:: test
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -13,3 +8,10 @@ Subpackages
 
     test.providers
 
+Module contents
+---------------
+
+.. automodule:: test
+    :members:
+    :undoc-members:
+    :show-inheritance:

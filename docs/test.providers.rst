@@ -1,11 +1,6 @@
 test.providers package
 ======================
 
-.. automodule:: test.providers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -13,3 +8,10 @@ Subpackages
 
     test.providers.acquantum
 
+Module contents
+---------------
+
+.. automodule:: test.providers
+    :members:
+    :undoc-members:
+    :show-inheritance:

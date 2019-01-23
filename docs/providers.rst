@@ -1,11 +1,6 @@
 providers package
 =================
 
-.. automodule:: providers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 Subpackages
 -----------
 
@@ -13,3 +8,10 @@ Subpackages
 
     providers.acquantum
 
+Module contents
+---------------
+
+.. automodule:: providers
+    :members:
+    :undoc-members:
+    :show-inheritance:
