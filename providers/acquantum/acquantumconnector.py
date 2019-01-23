@@ -33,8 +33,8 @@ class AcQuantumConnector(object):
 
     def __init__(self):
         self._req = requests.session()
-        self._credentials: AcQuantumCredentials = None
-        self._session: AcQuantumSession = None
+        self._credentials = None
+        self._session = None
 
     def create_session(self, credentials):
         # type: (AcQuantumCredentials) -> None
