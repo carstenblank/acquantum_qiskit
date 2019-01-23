@@ -1,6 +1,11 @@
 providers.acquantum.credentials package
 =======================================
 
+.. automodule:: providers.acquantum.credentials
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Submodules
 ----------
 
@@ -13,10 +18,3 @@ providers.acquantum.credentials.credentials module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: providers.acquantum.credentials
-    :members:
-    :undoc-members:
-    :show-inheritance:
