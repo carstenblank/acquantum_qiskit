@@ -1,7 +1,8 @@
+import os
 import re
 import sys
 import time
-from os import listdir, remove, os
+from os import listdir, remove
 from unittest import TestCase
 
 from providers.acquantum.acquantumconnector import AcQuantumConnector
