@@ -1,7 +1,7 @@
 import re
 import sys
 import time
-from os import listdir, remove
+from os import listdir, remove, os
 from unittest import TestCase
 
 from providers.acquantum.acquantumconnector import AcQuantumConnector
@@ -17,7 +17,7 @@ class TestAlibabaQuantum(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.api = AcQuantumConnector()
-        cls.api.create_session(AcQuantumCredentials('sebboer', 'qnpwzHyIIFw33Nw2PBx'))
+        cls.api.create_session(AcQuantumCredentials(os.environ['ACQ_USER'], os.environ['ACQ_PWD']))
 
     @classmethod
     def tearDownClass(cls):
@@ -43,7 +43,7 @@ class TestAlibabaQuantum(TestCase):
             self.api.delete_experiment(id)
 
     def test_create_session(self):
-        self.api.create_session(AcQuantumCredentials('sebboer', 'qnpwzHyIIFw33Nw2PBx'))
+        self.api.create_session(AcQuantumCredentials(os.environ['ACQ_USER'], os.environ['ACQ_PWD']))
 
     def test_save_session(self):
         self.api.save_session()
