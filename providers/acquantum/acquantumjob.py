@@ -191,6 +191,7 @@ class AcQuantumJob(BaseJob):
         try:
             result = self._api.get_result(experiment_id=int(self._job_id)).get_result()
         except AcQuantumRequestError as e:
+            print(e)
             self._status = AcQuantumJobStatus.ERROR
             return self._status
 

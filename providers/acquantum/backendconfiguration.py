@@ -20,7 +20,6 @@ class AcQuantumGateConfigSchema(BaseSchema):
                        validate=Length(min=1))
     conditional = Boolean()
     description = String()
-    pass
 
 
 class AcQuantumBackendConfigurationSchema(BaseSchema):

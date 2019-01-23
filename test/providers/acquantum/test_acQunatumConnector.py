@@ -40,8 +40,8 @@ class TestAlibabaQuantum(TestCase):
             res = self.api.get_experiments()
 
         exp_ids = [exp.experiment_id for exp in res]
-        for id in exp_ids:
-            self.api.delete_experiment(id)
+        for exp_id in exp_ids:
+            self.api.delete_experiment(exp_id)
 
     def test_create_session(self):
         self.api.create_session(AcQuantumCredentials(os.environ['ACQ_USER'], os.environ['ACQ_PWD']))
@@ -61,7 +61,7 @@ class TestAlibabaQuantum(TestCase):
     def test_create_experiment(self):
         try:
             exp_id = self.api.create_experiment(11, AcQuantumBackendType.SIMULATE, 'UnitTesting')
-            self.assertTrue(type(exp_id) is int)
+            self.assertTrue(isinstance(exp_id, int))
         except AcQuantumRequestError as e:
             self.fail(e)
 
@@ -188,14 +188,14 @@ class TestAlibabaQuantum(TestCase):
             self.fail(e)
 
     def test_delete_all_experiments(self):
-        exp_id = []
+        exp_ids = []
         for i in range(3):
             name = 'UnitTesting{}'.format(i)
             bit_width = 11 + i
-            exp_id.append(self._create_experiment(bit_width=bit_width, name=name))
-        for id in exp_id:
+            exp_ids.append(self._create_experiment(bit_width=bit_width, name=name))
+        for exp_id in exp_ids:
             try:
-                self.api.delete_experiment(id)
+                self.api.delete_experiment(exp_id)
             except AcQuantumRequestError as e:
                 self.fail(e)
 
