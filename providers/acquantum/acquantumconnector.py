@@ -32,7 +32,7 @@ class AcQuantumConnector(object):
     _TOKEN_HEADER_KEY = 'X-CSRF-TOKEN'
 
     def __init__(self):
-        self._req: requests.Session = requests.session()
+        self._req = requests.session()
         self._credentials: AcQuantumCredentials = None
         self._session: AcQuantumSession = None
 
