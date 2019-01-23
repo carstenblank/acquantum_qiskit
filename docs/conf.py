@@ -169,4 +169,6 @@ epub_title = project
 epub_exclude_files = ['search.html']
 
 # -- Extension configuration -------------------------------------------------
+autosummary_generate = True
+# the order in which autodoc lists the documented members
 autodoc_member_order = 'bysource'

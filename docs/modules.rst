@@ -5,4 +5,5 @@ qiskit_alibaba_provider
    :maxdepth: 4
 
    providers
+   setup
    test
