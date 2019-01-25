@@ -1,6 +1,6 @@
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.acquantumerrors import AcQuantumAccountError
 from providers.acquantum.credentials._env import read_credentials_from_environ
-from providers.acquantum.credentials.credentials import AcQuantumCredentials
 
 
 def discover_credentials() -> AcQuantumCredentials:

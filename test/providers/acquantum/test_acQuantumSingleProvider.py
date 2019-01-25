@@ -2,8 +2,8 @@ import os
 from unittest import TestCase
 from unittest.mock import Mock
 
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.acquantumsingleprovider import AcQuantumSingleProvider
-from providers.acquantum.credentials import AcQuantumCredentials
 
 
 class TestAcQuantumSingleProvider(TestCase):

@@ -1,9 +1,10 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
+from acquantumconnector.model.backendtype import AcQuantumBackendType
+from acquantumconnector.model.response import AcQuantumResultResponse, AcQuantumResult
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumjob import AcQuantumJob, AcQuantumJobStatus
-from providers.acquantum.models.Model import AcQuantumBackendType, AcQuantumResult, AcQuantumResultResponse
 
 
 class TestAcQuantumJob(TestCase):

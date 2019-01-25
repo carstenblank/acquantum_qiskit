@@ -1,9 +1,9 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
-from providers.acquantum.credentials import AcQuantumCredentials
 from providers.acquantum.models import AcQuantumExperimentDetail
 from providers.acquantum.models.Model import AcQuantumBackendType
 

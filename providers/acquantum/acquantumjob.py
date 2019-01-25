@@ -6,9 +6,9 @@ from typing import Any
 from qiskit.providers import BaseJob
 from qiskit.qobj import Qobj
 
+from acquantumconnector.model.errors import AcQuantumRequestError
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumerrors import AcQuantumJobTimeOutError
-from providers.acquantum.models import AcQuantumRequestError
 
 
 class AcQuantumJobStatus(Enum):

@@ -1,12 +1,13 @@
 from qiskit.providers import BaseBackend
 from qiskit.qobj import Qobj
 
-from providers.acquantum.acquantumconnector import AcQuantumConnector
+from acquantumconnector.connector.acquantumconnector import AcQuantumConnector
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
+from acquantumconnector.model.backendtype import AcQuantumBackendType
+from acquantumconnector.model.errors import AcQuantumRequestError
 from providers.acquantum.acquantumerrors import AcQuantumError, AcQuantumBackendError
 from providers.acquantum.acquantumjob import AcQuantumJob
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
-from providers.acquantum.credentials import AcQuantumCredentials
-from providers.acquantum.models.Model import AcQuantumBackendType, AcQuantumRequestError
 
 
 class AcQuantumBackend(BaseBackend):

@@ -3,8 +3,9 @@ from collections import OrderedDict, _OrderedDictItemsView
 from jsonschema import ValidationError
 from qiskit.providers import BaseProvider
 
+from acquantumconnector.connector.acquantumconnector import AcQuantumConnector
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.acquantumconnector import AcQuantumConnector, AcQuantumCredentials
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 
 

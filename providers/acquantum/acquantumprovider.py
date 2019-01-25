@@ -3,10 +3,11 @@ from collections import OrderedDict
 
 from qiskit.providers import BaseProvider
 
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.acquantumerrors import AcQuantumAccountError
 from providers.acquantum.acquantumsingleprovider import AcQuantumSingleProvider
-from providers.acquantum.credentials import discover_credentials, AcQuantumCredentials
+from providers.acquantum.credentials import discover_credentials
 
 
 class AcQuantumProvider(BaseProvider):
