@@ -15,10 +15,15 @@
 import datetime
 import time
 from enum import Enum
-from typing import Any
+from typing import Any, List, Tuple
 
+from acquantumconnector.model.gates import Gate, CPhase, HGate
+import qiskit
+from qiskit import QuantumCircuit
+from qiskit.dagcircuit import DAGCircuit
+from qiskit.extensions.standard import U2Gate, U3Gate, U1Gate, CnotGate
 from qiskit.providers import BaseJob
-from qiskit.qobj import Qobj
+from qiskit.qobj import Qobj, QobjConfig, QobjHeader, QobjExperiment, QobjItem
 
 from acquantumconnector.model.errors import AcQuantumRequestError
 from providers.acquantum.acquantumerrors import AcQuantumJobError
@@ -256,6 +261,81 @@ class AcQuantumJob(BaseJob):
 
     @classmethod
     def _gates_from_qobj(cls, qobj):
-        # type: (Qobj) -> [Gates]
+        # type: (Qobj) -> List[Gate]
+
+        id = qobj.qobj_id  # type: str
+        config = qobj.config  # type: QobjConfig
+        header = qobj.header  # type: QobjHeader
+        # I will most likely not use the following fields...
+        # TODO: remove when done
+        # experiments = qobj.experiments  # type: List[QobjExperiment]
+        # for experiment in experiments:
+        #     exp_header = experiment.header  # type: QobjItem
+        #     exp_header.clbit_labels  # type: List[Tuple[str, int]]
+        #     exp_header.qubit_labels  # type: List[Tuple[str, int]]
+        #     exp_header.creg_sizes  # type: List[Tuple[str, int]]
+        #     exp_header.qreg_sizes  # type: List[Tuple[str, int]]
+        #     exp_header.memory_slots  # type: int
+        #     exp_header.n_qubits  # type: int
+        #     exp_header.name  # type: str
+        #     exp_header.compiled_circuit_qasm  # type: str
+        #
+        #     # every element has fields: memory: List[int], name: str, params: List[float], qubits: List[int], texparams: List[str]
+        #     exp_instr = experiment.instructions  # type: List[QobjItem]
+
+        from qiskit.converters import qobj_to_circuits, circuit_to_dag
+
+        qc = qobj_to_circuits(qobj)  # type: QuantumCircuit
+        dag = circuit_to_dag(qc)  # type: DAGCircuit
+
+        layer = {}  # type: dict
+        for layer in dag.layers():
+            layer_dag = layer["graph"]  # type: DAGCircuit
+
+            gates = []  # type: List[Gate]
+            x = 0
+            for op_node in layer_dag.get_op_nodes():
+                # Given keys:
+                # op_node[1]["cargs"]
+                # op_node[1]["condition"]
+                # op_node[1]["name"]
+                # op_node[1]["qargs"]
+                # op_node[1]["type"]
+                # op_node[1]["op"]
+
+                if isinstance(op_node[1]["op"], U2Gate):
+                    u2 = op_node[1]["op"]  # type: U2Gate
+                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
+                    # and that the index simply tells me which wire this is.
+                    qubit, y = u2.qargs[0]  # Tuple[QuantumRegister, int]
+                    # TODO
+                elif isinstance(op_node[1]["op"], U1Gate):
+                    u1 = op_node[1]["op"]  # type: U1Gate
+                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
+                    # and that the index simply tells me which wire this is.
+                    qubit, y = u1.qargs[0]
+                    # TODO
+                elif isinstance(op_node[1]["op"], U3Gate):
+                    u3 = op_node[1]["op"]  # type: U3Gate
+                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
+                    # and that the index simply tells me which wire this is.
+                    qubit, y = u3.qargs[0]
+                    # TODO
+                elif isinstance(op_node[1]["op"], CnotGate):
+                    cx = op_node[1]["op"]  # type: CnotGate
+                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
+                    # and that the index simply tells me which wire this is.
+                    ctr, y1 = cx.qargs[0]
+                    tgt, y2 = cx.qargs[1]
+                    gates.append(HGate(x, y2))
+                    gates.append(CPhase(x, [y1, y2]))
+                    gates.append(HGate(x, y2))
+                elif isinstance(op_node[1]["op"], qiskit.circuit.Measure):
+                    measure = op_node[1]["op"]  # type: qiskit.circuit.Measure
+                    qubit, y = measure.qargs[0]
+                    # TODO
+
+                x += 1
+
         # TODO: Implement Qobj to Gates
         return []
