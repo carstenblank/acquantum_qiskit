@@ -125,16 +125,22 @@ class AcQuantumJob(BaseJob):
     def cancel(self):
         # type: () -> bool
         """
-        THIS METHOD DELETES THE JOB
-        JOB CANCELING IS NOT IMPLEMENTED YET
-
-        :return: bool: True if job can be cancelled else False. Currently this is
+        :return: bool: True if job can be cancelled else False.
         :raises: AcQuantumJobError: if there was some unexpected failure in the server
         """
         try:
-            self._api.delete_experiment(experiment_id=int(self._job_id))
-            return True
+            # self._api.del(experiment_id=int(self._job_id))
+            status = self.status()
+            if status is AcQuantumJobStatus.QUEUED:
+                result = self._api.get_result(int(self.job_id())).get_result()
+                if result:
+                    self._api.delete_result(result.result_id)
+                    self._status = AcQuantumJobStatus.CANCELLED
+                    return True
+            else:
+                return False
         except AcQuantumRequestError as ex:
+            self._status = AcQuantumJobStatus.ERROR
             raise AcQuantumJobError('Error canceling job: {}'.format(ex.message))
 
     def result(self, timeout=None, wait=5):
@@ -188,6 +194,9 @@ class AcQuantumJob(BaseJob):
         :return: The status of the job, once updated
         :raises: AcQuantumJobError: if there was an unknown answer from the server
         """
+        if self._status is AcQuantumJobStatus.CANCELLED:
+            return self._status
+
         try:
             result = self._api.get_result(experiment_id=int(self._job_id)).get_result()
         except AcQuantumRequestError as e:
