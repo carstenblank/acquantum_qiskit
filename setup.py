@@ -34,6 +34,7 @@ info = {
     'url': 'https://github.com/sebboer/acquantum_qiskit',
     'install_requires': requirements,
     'packages': [
+        'providers'
         'providers.acquantum'
         'providers.acquantum.credentials'
         'providers.acquantum.models'
