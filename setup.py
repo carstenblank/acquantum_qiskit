@@ -12,7 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import setuptools
+from setuptools import setup
+
+with open("providers/_version.py") as f:
+    version = f.readlines()[-1].split()[-1].strip("\"'")
 
 with open("README.rst", "r") as fh:
     long_description = fh.read()
@@ -20,22 +23,29 @@ with open("README.rst", "r") as fh:
 with open("requirements.txt") as f:
     requirements = f.readlines()
 
-setuptools.setup(
-    name="acquantum_qiskit",
-    version="0.0.1",
-    author="Carsten Blank",
-    author_email="blank@data-cybernetics.com",
-    description="",
-    long_description=long_description,
-    long_description_content_type="rst",
-    url="https://github.com/sebboer/acquantum_qiskit",
-    packages=setuptools.find_packages(),
-    install_requires=requirements,
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Programming Language :: Python :: 3",
-        'Programming Language :: Python :: 3 :: Only',
-        "License :: OSI Approved :: Apache Software License",
-        "Operating System :: OS Independent",
+info = {
+    'name': 'acquantum-qiskit',
+    'version': '0.0.1',
+    'author': 'Carsten Blank',
+    'author_email': 'blank@data-cybernetics.com',
+    'description': '',
+    'long_description': long_description,
+    'long_description_content_type': 'rst',
+    'url': 'https://github.com/sebboer/acquantum_qiskit',
+    'install_requires': requirements,
+    'packages': [
+        'providers.acquantum'
+        'providers.acquantum.credentials'
+        'providers.acquantum.models'
     ],
-)
+}
+
+classifiers = [
+    'Development Status :: 4 - Beta',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3 :: Only',
+    'License :: OSI Approved :: Apache Software License',
+    'Operating System :: OS Independent',
+]
+
+setup(classifiers=classifiers, **info)
