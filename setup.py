@@ -25,20 +25,20 @@ with open("requirements.txt") as f:
 
 info = {
     'name': 'acquantum-qiskit',
-    'version': '0.0.1',
+    'version': version,
     'author': 'Carsten Blank',
     'author_email': 'blank@data-cybernetics.com',
     'description': '',
     'long_description': long_description,
-    'long_description_content_type': 'rst',
     'url': 'https://github.com/sebboer/acquantum_qiskit',
     'install_requires': requirements,
     'packages': [
-        'providers'
-        'providers.acquantum'
-        'providers.acquantum.credentials'
+        'providers',
+        'providers.acquantum',
+        'providers.acquantum.credentials',
         'providers.acquantum.models'
     ],
+    'license': 'Apache 2.0',
 }
 
 classifiers = [
