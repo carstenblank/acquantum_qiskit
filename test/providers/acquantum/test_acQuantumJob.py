@@ -33,6 +33,10 @@ class TestAcQuantumJob(TestCase):
         job.submit()
         # Assertion
         self.assertEqual(job.job_id(), str(job_id))
+        api_mock.create_experiment.assert_called_once_with(n_qubits, backend_type, job_name)
+        api_mock.update_experiment.assert_called_once()
+        api_mock.run_experiment.assert_called_once_with(job_id, backend_type, n_qubits, qobj_mock.config.shots,
+                                                        qobj_mock.config.seeds)
 
     def test_job_id_failed(self):
         qobj_mock = Mock()
