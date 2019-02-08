@@ -165,7 +165,7 @@ class AcQuantumJob(BaseJob):
             raise AcQuantumJobError('Error canceling job: {}'.format(ex.message))
 
     def result(self, timeout=None, wait=5):
-        # type: (int, int) -> qiskit.Result
+        # type: (int, int) -> Result
         """
         Return the result from the job.
         :param timeout: number of seconds to wait for job
@@ -261,7 +261,7 @@ class AcQuantumJob(BaseJob):
 
     @classmethod
     def _result_from_job_response(cls, job_response):
-        # type: (AcQuantumResultResponse) -> qiskit.Result
+        # type: (AcQuantumResultResponse) -> Result
         # TODO: Implement qiskit.Result
         return None
 
