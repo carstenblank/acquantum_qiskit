@@ -116,59 +116,6 @@ class AcQuantumExperiment:
         return 'AcExperiment: {{ data: {}, code: {}, detail: {} }}'.format(self.data, self.code, self.detail)
 
 
-class AcQuantumResultResponse:
-
-    def __init__(self, simulated_result=None, real_result=None):
-        # type: ([AcQuantumResult], [AcQuantumResult]) -> None
-        self.simulated_result = simulated_result
-        self.real_result = real_result
-
-    def get_result(self):
-        # type: () -> AcQuantumResult or (AcQuantumResult, AcQuantumResult)
-        if self.simulated_result:
-            if self.real_result:
-                return self.real_result, self.simulated_result
-            return self.simulated_result[0]
-        else:
-            return self.real_result[0]
-
-    def __str__(self):
-        return 'AcResultResponse {{ simulated_result: {}, real_result: {} }}'.format(self.simulated_result,
-                                                                                     self.real_result)
-
-    def __repr__(self):
-        return 'AcResultResponse {{ simulated_result: {}, real_result: {} }}'.format(self.simulated_result,
-                                                                                     self.real_result)
-
-
-class AcQuantumResult:
-
-    def __init__(self, result_id, seed, shots, start_time, measure_qubits, finish_time=None, process=None, data=None,
-                 exception=None):
-        # type: (int, int, int, str, [int], str, str, dict, Any) -> None
-        self.result_id = result_id
-        self.seed = seed
-        self.shots = shots
-        self.start_time = start_time
-        self.measure_qubits = measure_qubits
-        self.finish_time = finish_time
-        self.process = process
-        self.data = data
-        self.exception = exception
-
-    def __str__(self):
-        return 'AcResult: {{ result_id: {}, seed: {}, shots: {}, start_time: {}, measure_qubits: {},  ' \
-               'finish_time: {}, process: {}, data: {} }} '.format(self.result_id, self.seed, self.shots,
-                                                                   self.start_time, self.measure_qubits,
-                                                                   self.finish_time, self.process, self.data)
-
-    def __repr__(self):
-        return 'AcResult: {{ result_id: {}, seed: {}, shots: {}, start_time: {}, measure_qubits: {}, ' \
-               'finish_time: {}, process: {}, data: {} }} '.format(self.result_id, self.seed, self.shots,
-                                                                   self.start_time, self.measure_qubits,
-                                                                   self.finish_time, self.process, self.data)
-
-
 class AcQuantumRawConfig:
 
     def __init__(self, system_config, one_q_gate_fidelities, qubit_parameter, system_status, two_q_gate_fidelity):

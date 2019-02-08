@@ -17,6 +17,8 @@ from unittest.mock import Mock
 
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from acquantumconnector.model.backendtype import AcQuantumBackendType
+from acquantumconnector.model.response import AcQuantumResult, AcQuantumResultResponse
+
 from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 from providers.acquantum.models import AcQuantumExperimentDetail
@@ -60,6 +62,11 @@ class TestAcQuantumBackend(TestCase):
         }
         config = AcQuantumBackendConfiguration.from_dict(backend_config)
         api_mock.get_experiments.return_value = jobs
+        api_mock.get_result.return_value = AcQuantumResultResponse(
+            simulated_result=[
+                AcQuantumResult(result_id=12, seed=100, shots=10, start_time='2019-01-11', measure_qubits=11,
+                                finish_time=None, process="", exception=None)]
+        )
         cred = AcQuantumCredentials('', '')
         backend = AcQuantumBackend(config, None, cred, api_mock)
         jobs = backend.jobs()

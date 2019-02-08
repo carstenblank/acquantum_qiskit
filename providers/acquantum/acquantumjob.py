@@ -15,17 +15,19 @@
 import datetime
 import time
 from enum import Enum
-from typing import Any, List, Tuple
+from typing import Any, List
 
-from acquantumconnector.model.gates import Gate, CPhase, HGate
 import qiskit
+from acquantumconnector.model.errors import AcQuantumRequestError
+from acquantumconnector.model.gates import Gate, CPhase, HGate
+from acquantumconnector.model.response import AcQuantumResultResponse, AcQuantumResult
 from qiskit import QuantumCircuit
 from qiskit.dagcircuit import DAGCircuit
 from qiskit.extensions.standard import U2Gate, U3Gate, U1Gate, CnotGate
 from qiskit.providers import BaseJob
-from qiskit.qobj import Qobj, QobjConfig, QobjHeader, QobjExperiment, QobjItem
+from qiskit.qobj import Qobj, QobjConfig, QobjHeader
+from qiskit.result import Result
 
-from acquantumconnector.model.errors import AcQuantumRequestError
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumerrors import AcQuantumJobTimeOutError
 
@@ -151,9 +153,9 @@ class AcQuantumJob(BaseJob):
             # self._api.del(experiment_id=int(self._job_id))
             status = self.status()
             if status is AcQuantumJobStatus.QUEUED:
-                result = self._api.get_result(int(self.job_id())).get_result()
+                result = self._api.get_result(int(self.job_id())).get_results()
                 if result:
-                    self._api.delete_result(result.result_id)
+                    self._api.delete_result(result[-1].result_id)
                     self._status = AcQuantumJobStatus.CANCELLED
                     return True
             else:
@@ -217,7 +219,11 @@ class AcQuantumJob(BaseJob):
             return self._status
 
         try:
-            result = self._api.get_result(experiment_id=int(self._job_id)).get_result()
+            result = self._api.get_result(experiment_id=int(self._job_id)).get_results()
+            if not result:
+                self._status = AcQuantumJobStatus.QUEUED
+            else:
+                result = result[-1]
         except AcQuantumRequestError as e:
             print(e)
             self._status = AcQuantumJobStatus.ERROR

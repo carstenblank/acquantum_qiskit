@@ -12,6 +12,5 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from .Model import AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumResultResponse, AcQuantumResult, \
-    AcQuantumExperimentDetail, \
+from .Model import AcQuantumRequestError, AcQuantumRequestForbiddenError, AcQuantumExperimentDetail, \
     AcQuantumExperiment, AcQuantumResponse, AcQuantumErrorResponse
