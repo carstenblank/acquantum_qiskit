@@ -14,11 +14,11 @@
 
 from collections import OrderedDict, _OrderedDictItemsView
 
+from acquantumconnector.connector.acquantumconnector import AcQuantumConnector
+from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from jsonschema import ValidationError
 from qiskit.providers import BaseProvider
 
-from acquantumconnector.connector.acquantumconnector import AcQuantumConnector
-from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
 
@@ -66,8 +66,8 @@ class AcQuantumSingleProvider(BaseProvider):
                     api=self._api)
             except ValidationError as ex:
                 print(
-                    'Remote backend {} could not be instantiated due to an invalid config: {}'
-                        .format(raw_config.get('backend_name', raw_config.get('name', 'unknown')), ex)
+                    'Remote backend {} could not be instantiated due to an invalid config: {}'.format(
+                        raw_config.get('backend_name', raw_config.get('name', 'unknown')), ex)
                 )
 
         return ret
