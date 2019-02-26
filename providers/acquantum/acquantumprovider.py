@@ -51,8 +51,11 @@ class AcQuantumProvider(BaseProvider):
             raise AcQuantumBackendError('zero backends found')
         return backends
 
-    def load_account(self):
-        self._append_account(discover_credentials())
+    def load_account(self, credentials=None):
+        if credentials is None:
+            self._append_account(discover_credentials())
+        else:
+            self._append_account(credentials)
 
         if not self._accounts:
             raise AcQuantumAccountError('No AcQuantum credentials found.')
