@@ -128,23 +128,33 @@ class AcQuantumJob(BaseJob):
         if self._qobj is None:
             raise AcQuantumJobError('Can not find qobj')
 
+        if len(self._qobj.experiments) != 1:
+            raise AcQuantumJobError('The qobj must have exactly one (1) experiment.')
+
         if n_qubits is None:
             n_qubits = self._backend.configuration().n_qubits
 
         backend_type = self._backend.backend_type()
 
         if self._job_name is None:
-            self._job_name = self._generate_job_name()
+            if self._qobj.experiments[0].header.name:
+                self._job_name = self._qobj.experiments[0].header.name
+            else:
+                self._job_name = self._generate_job_name()
+        job_id = None
         try:
             job_id = self._api.create_experiment(n_qubits, backend_type, self._job_name)
             self._job_id = str(job_id)
 
             gates = self._gates_from_qobj(self._qobj)
+            self._api.update_experiment(job_id, gates, code=json.dumps(self._qobj.as_dict()))
 
-            self._api.update_experiment(job_id, gates)
-            self._api.run_experiment(job_id, backend_type, n_qubits, self._qobj.config.shots,
-                                     self._qobj.config.seeds)  # TODO HANDLE INPUT
+            seed = getattr(self._qobj.config, "seed", None)
+            self._api.run_experiment(job_id, experiment_type=backend_type, bit_width=n_qubits,
+                                     shots=self._qobj.config.shots, seed=seed)
         except AcQuantumRequestError as e:
+            if job_id is not None:
+                self._api.delete_experiment(job_id)
             raise AcQuantumJobError(e.message)
 
     def cancel(self):
