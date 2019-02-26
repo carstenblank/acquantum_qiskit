@@ -13,23 +13,27 @@
 #   limitations under the License.
 
 import datetime
+import json
+import math
 import time
 from enum import Enum
-from typing import Any, List
+from typing import Any, List, Dict, Union
 
 import qiskit
-from acquantumconnector.model.errors import AcQuantumRequestError
-from acquantumconnector.model.gates import Gate, CPhase, HGate
-from acquantumconnector.model.response import AcQuantumResultResponse, AcQuantumResult
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.dagcircuit import DAGCircuit
-from qiskit.extensions.standard import U2Gate, U3Gate, U1Gate, CnotGate
-from qiskit.providers import BaseJob
-from qiskit.qobj import Qobj, QobjConfig, QobjHeader
+from qiskit.providers import BaseJob, BaseBackend
+from qiskit.providers.models import BackendConfiguration
+from qiskit.qobj import Qobj
 from qiskit.result import Result
 
-from providers.acquantum.acquantumerrors import AcQuantumJobError
-from providers.acquantum.acquantumerrors import AcQuantumJobTimeOutError
+from acquantumconnector.model.errors import AcQuantumRequestError
+from acquantumconnector.model.gates import Gate
+from acquantumconnector.model.response import AcQuantumResultResponse, AcQuantumResult
+from acquantumconnector.connector.acquantumconnector import AcQuantumConnector
+from .acquantumerrors import AcQuantumJobError
+from .acquantumerrors import AcQuantumJobTimeOutError
+from .models import AcQuantumExperiment
 
 
 class AcQuantumJobStatus(Enum):
@@ -260,47 +264,34 @@ class AcQuantumJob(BaseJob):
         return self._queue_position
 
     @classmethod
-    def _result_from_job_response(cls, job_response):
-        # type: (AcQuantumResultResponse) -> Result
-        # TODO: Implement qiskit.Result
-        return None
-
-    @classmethod
     def _gates_from_qobj(cls, qobj):
         # type: (Qobj) -> List[Gate]
-
-        id = qobj.qobj_id  # type: str
-        config = qobj.config  # type: QobjConfig
-        header = qobj.header  # type: QobjHeader
-        # I will most likely not use the following fields...
-        # TODO: remove when done
-        # experiments = qobj.experiments  # type: List[QobjExperiment]
-        # for experiment in experiments:
-        #     exp_header = experiment.header  # type: QobjItem
-        #     exp_header.clbit_labels  # type: List[Tuple[str, int]]
-        #     exp_header.qubit_labels  # type: List[Tuple[str, int]]
-        #     exp_header.creg_sizes  # type: List[Tuple[str, int]]
-        #     exp_header.qreg_sizes  # type: List[Tuple[str, int]]
-        #     exp_header.memory_slots  # type: int
-        #     exp_header.n_qubits  # type: int
-        #     exp_header.name  # type: str
-        #     exp_header.compiled_circuit_qasm  # type: str
-        #
-        #     # every element has fields: memory: List[int], name: str, params: List[float], qubits: List[int], texparams: List[str]
-        #     exp_instr = experiment.instructions  # type: List[QobjItem]
-
+        import qiskit.extensions.standard as standard_gates
+        import acquantumconnector.model.gates as ac_gates
         from qiskit.converters import qobj_to_circuits, circuit_to_dag
 
-        qc = qobj_to_circuits(qobj)  # type: QuantumCircuit
-        dag = circuit_to_dag(qc)  # type: DAGCircuit
+        qubit_labels = qobj.experiments[0].header.qubit_labels  # type: List[List[Any]]
 
-        layer = {}  # type: dict
+        qc = qobj_to_circuits(qobj)  # type: QuantumCircuit
+        # TODO: do all circuits.
+        dag = circuit_to_dag(qc[0])  # type: DAGCircuit
+
+        # Result
+        gates = []  # type: List[Gate]
+
+        def get_q_index(qarg):
+            qubit, y = qarg
+            q_index = qubit_labels.index([qubit.name, y])
+            return q_index
+
+        current_layer_x_number = 1
+        layer = {}  # type: Dict[str, Union[DAGCircuit, list]]
         for layer in dag.layers():
             layer_dag = layer["graph"]  # type: DAGCircuit
+            x_numbers = dict((qubit_labels.index([r.name, i]), current_layer_x_number) for r, i in layer_dag.wires
+                             if isinstance(r, QuantumRegister))
 
-            gates = []  # type: List[Gate]
-            x = 0
-            for op_node in layer_dag.get_op_nodes():
+            for op_node in layer_dag.get_op_nodes(data=True):
                 # Given keys:
                 # op_node[1]["cargs"]
                 # op_node[1]["condition"]
@@ -309,39 +300,162 @@ class AcQuantumJob(BaseJob):
                 # op_node[1]["type"]
                 # op_node[1]["op"]
 
-                if isinstance(op_node[1]["op"], U2Gate):
-                    u2 = op_node[1]["op"]  # type: U2Gate
+                if isinstance(op_node[1]["op"], standard_gates.U1Gate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.U1Gate
+                    y = get_q_index(qk_gate.qargs[0])
+                    [theta] = qk_gate.param
+                    gates.append(ac_gates.RzGate(x_numbers[y], y + y, theta))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.U2Gate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.U2Gate
+                    y = get_q_index(qk_gate.qargs[0])
+                    [phi, lam] = qk_gate.param
+
+                    # ignore global phase alpha!
+                    # alpha = lam/2 + phi/2
+                    beta = phi
+                    delta = lam
+                    gamma = math.pi / 2
+                    gates.append(ac_gates.RzGate(x_numbers[y], y + 1, delta))
+                    x_numbers[y] += 1
+                    gates.append(ac_gates.RyGate(x_numbers[y], y + 1, gamma))
+                    x_numbers[y] += 1
+                    gates.append(ac_gates.RzGate(x_numbers[y], y + 1, beta))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.U3Gate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.U3Gate
                     # I assume that all qubits have been transformed into the qubit regsiter 'q'
                     # and that the index simply tells me which wire this is.
-                    qubit, y = u2.qargs[0]  # Tuple[QuantumRegister, int]
-                    # TODO
-                elif isinstance(op_node[1]["op"], U1Gate):
-                    u1 = op_node[1]["op"]  # type: U1Gate
-                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
-                    # and that the index simply tells me which wire this is.
-                    qubit, y = u1.qargs[0]
-                    # TODO
-                elif isinstance(op_node[1]["op"], U3Gate):
-                    u3 = op_node[1]["op"]  # type: U3Gate
-                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
-                    # and that the index simply tells me which wire this is.
-                    qubit, y = u3.qargs[0]
-                    # TODO
-                elif isinstance(op_node[1]["op"], CnotGate):
-                    cx = op_node[1]["op"]  # type: CnotGate
-                    # I assume that all qubits have been transformed into the qubit regsiter 'q'
-                    # and that the index simply tells me which wire this is.
-                    ctr, y1 = cx.qargs[0]
-                    tgt, y2 = cx.qargs[1]
-                    gates.append(HGate(x, y2))
-                    gates.append(CPhase(x, [y1, y2]))
-                    gates.append(HGate(x, y2))
+                    [theta, phi, lam] = qk_gate.param
+                    y = get_q_index(qk_gate.qargs[0])
+
+                    # ignore global phase alpha!
+                    # alpha = lam/2 + phi/2
+                    beta = phi
+                    delta = lam
+                    gamma = theta
+                    gates.append(ac_gates.RzGate(x_numbers[y], y + 1, delta))
+                    x_numbers[y] += 1
+                    gates.append(ac_gates.RyGate(x_numbers[y], y + 1, gamma))
+                    x_numbers[y] += 1
+                    gates.append(ac_gates.RzGate(x_numbers[y], y + 1, beta))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.HGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.HGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.HGate(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.RXGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.RXGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    [theta] = qk_gate.param
+                    gates.append(ac_gates.RxGate(x_numbers[y], y + 1, theta))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.RYGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.RYGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    [theta] = qk_gate.param
+                    gates.append(ac_gates.RyGate(x_numbers[y], y + 1, theta))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.RZGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.RZGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    [theta] = qk_gate.param
+                    gates.append(ac_gates.RzGate(x_numbers[y], y + 1, theta))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.XGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.XGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.XGate(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.YGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.YGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.YGate(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.ZGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.ZGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.ZGate(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.SGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.SGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.SGate(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.SdgGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.SdgGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.SDag(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.TGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.TGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.TGate(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.TdgGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.TdgGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.TDag(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.CrzGate):
+                    qk_gate = op_node[1]["op"]  # type: standard_gates.CrzGate
+                    y = get_q_index(qk_gate.qargs[0])
+                    gates.append(ac_gates.CPhase(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.CnotGate):
+                    cx = op_node[1]["op"]  # type: standard_gates.CnotGate
+                    y1 = get_q_index(cx.qargs[0])
+                    y2 = get_q_index(cx.qargs[1])
+                    gates.append(ac_gates.HGate(x_numbers[y2], y2 + 1))
+                    x_numbers[y1] += 1
+                    x_numbers[y2] += 1
+                    gates.append(ac_gates.CPhase(x_numbers[y2], [y1 + 1, y2 + 1]))
+                    x_numbers[y1] += 1
+                    x_numbers[y2] += 1
+                    gates.append(ac_gates.HGate(x_numbers[y2], y2 + 1))
+                    x_numbers[y1] += 1
+                    x_numbers[y2] += 1
+
+                elif isinstance(op_node[1]["op"], standard_gates.ToffoliGate):
+                    cx = op_node[1]["op"]  # type: standard_gates.ToffoliGate
+                    y1 = get_q_index(cx.qargs[0])
+                    y2 = get_q_index(cx.qargs[1])
+                    y3 = get_q_index(cx.qargs[2])
+                    gates.append(ac_gates.HGate(x_numbers[y3], y3 + 1))
+                    x_numbers[y1] += 1
+                    x_numbers[y2] += 1
+                    x_numbers[y3] += 1
+                    gates.append(ac_gates.CCPhase(x_numbers[y3], [y1 + 1, y2 + 1, y3 + 1]))
+                    x_numbers[y1] += 1
+                    x_numbers[y2] += 1
+                    x_numbers[y3] += 1
+                    gates.append(ac_gates.HGate(x_numbers[y3], y3 + 1))
+                    x_numbers[y1] += 1
+                    x_numbers[y2] += 1
+                    x_numbers[y3] += 1
+
                 elif isinstance(op_node[1]["op"], qiskit.circuit.Measure):
                     measure = op_node[1]["op"]  # type: qiskit.circuit.Measure
-                    qubit, y = measure.qargs[0]
-                    # TODO
+                    y = get_q_index(measure.qargs[0])
+                    gates.append(ac_gates.Measure(x_numbers[y], y + 1))
+                    x_numbers[y] += 1
 
-                x += 1
+            current_layer_x_number = max(x_numbers.values())
 
-        # TODO: Implement Qobj to Gates
-        return []
+        return gates
