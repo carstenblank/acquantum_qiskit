@@ -260,6 +260,55 @@ class AcQuantumJob(BaseJob):
         # type: () -> str
         return 'Qiskit_generated_{}'.format(self._creation_date)
 
+    def _result_from_job_response(self, job_response):
+        # type: (AcQuantumResultResponse) -> Result
+
+        backend = self.backend()  # type: BaseBackend
+        config = backend.configuration()  # type: BackendConfiguration
+        experiment = self._api.get_experiment(int(self.job_id()))  # type: AcQuantumExperiment
+
+        result_details = {}
+        job_results = job_response.get_results()
+        if len(job_results) == 1:
+            experiment_result = job_results[0]  # type: AcQuantumResult
+
+            counts = dict((hex(int(k, 2)), int(v * experiment_result.shots)) for k, v in experiment_result.data.items())
+            self._qobj = Qobj.from_dict(json.loads(experiment.code))
+            self._job_name = self._qobj.experiments[0].header.name
+
+            success = experiment_result.exception is None
+
+            result_details = {
+                "status": self._status.name,
+                "success": success,
+                "name": self._job_name,
+                "seed": experiment_result.seed,
+                "shots": experiment_result.shots,
+                "data": {
+                    "counts": counts
+                },
+                "start_time": experiment_result.start_time,
+                "finish_time": experiment_result.finish_time,
+                "header": self._qobj.experiments[0].header.as_dict()
+            }
+
+        result_dict = {
+            'results': [result_details],
+            'backend_name': config.backend_name,
+            'backend_version': config.backend_version,
+            'qobj_id': self._qobj.qobj_id,
+            'job_id': str(self.job_id()),
+            'success': len(job_results) == 1,
+            'header': {
+                "backend_name": config.backend_name
+            },
+            "date": result_details['finish_time']
+        }
+
+        result = Result.from_dict(result_dict)
+
+        return result
+
     @classmethod
     def _is_job_queued(cls, result):
         # type: (AcQuantumResult) -> (bool, int)
