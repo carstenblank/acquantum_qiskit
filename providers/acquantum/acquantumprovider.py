@@ -18,10 +18,10 @@ from collections import OrderedDict
 from qiskit.providers import BaseProvider
 
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
-from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.acquantumerrors import AcQuantumAccountError, AcQuantumBackendError
-from providers.acquantum.acquantumsingleprovider import AcQuantumSingleProvider
-from providers.acquantum.credentials import discover_credentials
+from .acquantumbackend import AcQuantumBackend
+from .acquantumerrors import AcQuantumAccountError, AcQuantumBackendError
+from .acquantumsingleprovider import AcQuantumSingleProvider
+from .credentials import discover_credentials
 
 
 class AcQuantumProvider(BaseProvider):
