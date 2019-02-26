@@ -67,7 +67,7 @@ class AcQuantumJob(BaseJob):
     """
 
     def __init__(self, backend, job_id, api, is_device, qobj=None, creation_date=None, api_status=None, job_name=None):
-        # type: ('AcQuantumBackend', str, 'AcQuantumConnector', bool, Qobj, Any, AcQuantumJobStatus, str) -> None
+        # type: (AcQuantumBackend, str, AcQuantumConnector, bool, Qobj, Any, AcQuantumJobStatus, str) -> None
         """
         :param backend: The backend instance used to run this job
         :param job_id: The job ID of an already submitted job
@@ -86,8 +86,8 @@ class AcQuantumJob(BaseJob):
             # validate_qobj_against_schema(qobj)
             self._qobj = qobj
 
-        self._api = api
-        self._backend = backend
+        self._api = api  # type: AcQuantumConnector
+        self._backend = backend  # type: 'AcQuantumBackend'
         self._cancelled = False
         self._status = AcQuantumJobStatus.INITIALIZING
         self._job_name = job_name
