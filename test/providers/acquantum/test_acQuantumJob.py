@@ -11,15 +11,18 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
 from unittest import TestCase, skip
 from unittest.mock import Mock
 
+import qiskit as qiskit
+from qiskit.result import Result
+
 from acquantumconnector.model.backendtype import AcQuantumBackendType
 from acquantumconnector.model.response import AcQuantumResultResponse, AcQuantumResult
-
+from providers.acquantum.acquantumbackend import AcQuantumBackend
 from providers.acquantum.acquantumerrors import AcQuantumJobError
 from providers.acquantum.acquantumjob import AcQuantumJob, AcQuantumJobStatus
+from providers.acquantum.acquantumprovider import AcQuantumProvider
 
 
 class TestAcQuantumJob(TestCase):
@@ -134,3 +137,63 @@ class TestAcQuantumJob(TestCase):
     def test_result(self):
         # TODO: Implement Result
         pass
+
+    def test__gates_from_qobj(self):
+        import qiskit.extensions.standard as standard
+        from qiskit.circuit.measure import measure
+        from qiskit.circuit import QuantumCircuit, QuantumRegister, ClassicalRegister
+
+        q = QuantumRegister(2, "q")
+        r = QuantumRegister(1, "r")
+        c = ClassicalRegister(2, "c")
+        ca = ClassicalRegister(1, "c^a")
+        qc = QuantumCircuit(q, c, r, ca, name="TestCircuit")
+        standard.h(qc, q[0])
+        standard.cx(qc, q[0], q[1])
+        standard.x(qc, r)
+        measure(qc, q, c)
+        measure(qc, r, ca)
+
+        provider = AcQuantumProvider()
+        provider.load_account()
+        backend = provider.get_backend("SIMULATE")
+
+        qobj = qiskit.compile(qc, backend=backend)
+
+        gates = AcQuantumJob._gates_from_qobj(qobj)
+        self.assertEqual(len(gates), 6)
+
+    def test_submit(self):
+        import qiskit.extensions.standard as standard
+        from qiskit.circuit.measure import measure
+        from qiskit.circuit import QuantumCircuit, QuantumRegister, ClassicalRegister
+
+        q = QuantumRegister(2, "q")
+        r = QuantumRegister(1, "r")
+        c = ClassicalRegister(2, "c")
+        ca = ClassicalRegister(1, "c^a")
+        qc = QuantumCircuit(q, r, c, ca, name="TestCircuit")
+        standard.h(qc, q[0])
+        standard.cx(qc, q[0], q[1])
+        standard.x(qc, r)
+        measure(qc, q, c)
+        measure(qc, r, ca)
+
+        provider = AcQuantumProvider()
+        provider.load_account()
+        backend = provider.get_backend("SIMULATE")  # type: AcQuantumBackend
+
+        qobj = qiskit.compile(qc, backend=backend)
+        job = backend.run(qobj)  # type: AcQuantumJob
+        result = job.result()  # type: Result
+
+        self.assertIsNotNone(result)
+
+        counts = result.get_counts()
+
+        self.assertListEqual(list(sorted(counts.keys())), ['1 01', '1 10'])
+        self.assertAlmostEqual(counts['1 01'], 512, delta=50)
+        self.assertAlmostEqual(counts['1 10'], 512, delta=50)
+
+        job._api.delete_experiment(job.job_id())
+
