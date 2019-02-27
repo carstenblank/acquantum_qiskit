@@ -161,7 +161,7 @@ class TestAcQuantumJob(TestCase):
         qobj = qiskit.compile(qc, backend=backend)
 
         gates = AcQuantumJob._gates_from_qobj(qobj)
-        self.assertEqual(len(gates), 6)
+        self.assertEqual(len(gates), 8)
 
     def test_submit(self):
         import qiskit.extensions.standard as standard
