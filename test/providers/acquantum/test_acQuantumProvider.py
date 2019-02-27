@@ -49,6 +49,10 @@ class TestAcQuantumProvider(TestCase):
         accounts = self.provider._accounts
         self.assertTrue(os.environ['ACQ_USER'] in accounts)
         single_prov_mock.assert_called()
+        if single_prov_mock.call_count == 0:
+            msg = ("Expected '%s' to have been called." %
+                   single_prov_mock._mock_name or 'mock')
+            raise AssertionError(msg)
         single_prov_mock.backends.assert_not_called()
 
     @mock.patch('providers.acquantum.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)

@@ -75,7 +75,7 @@ class TestAcQuantumSingleProvider(TestCase):
         provider = Mock()
         AcQuantumSingleProvider(self._cred, provider)
         create_session.assert_called_once_with(self._cred)
-        available_backends.assert_called_once()
+        available_backends.assert_called_once_with()
 
     @mock.patch('providers.acquantum.acquantumsingleprovider.AcQuantumConnector.create_session')
     @mock.patch('providers.acquantum.acquantumsingleprovider.AcQuantumConnector.available_backends',
@@ -91,4 +91,4 @@ class TestAcQuantumSingleProvider(TestCase):
         self.assertEqual('SIMULATE', sim)
         self.assertEqual('REAL', real)
         create_session.assert_called_once_with(self._cred)
-        available_backends.assert_called_once()
+        available_backends.assert_called_once_with()
