@@ -292,6 +292,9 @@ class AcQuantumJob(BaseJob):
                 "header": self._qobj.experiments[0].header.as_dict()
             }
 
+        from dateutil.parser import parser
+        date = parser().parse(result_details['finish_time'])
+
         result_dict = {
             'results': [result_details],
             'backend_name': config.backend_name,
@@ -302,7 +305,7 @@ class AcQuantumJob(BaseJob):
             'header': {
                 "backend_name": config.backend_name
             },
-            "date": result_details['finish_time']
+            "date": date.isoformat()
         }
 
         result = Result.from_dict(result_dict)
