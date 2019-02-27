@@ -1,5 +1,5 @@
 qiskit==0.7.0
-acquantum-connector==0.0.4
+acquantum-connector==0.0.5
 jsonschema<2.7
 marshmallow
 
