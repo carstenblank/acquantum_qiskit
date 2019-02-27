@@ -19,9 +19,9 @@ from acquantumconnector.connector.acquantumconnector import AcQuantumConnector
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from acquantumconnector.model.backendtype import AcQuantumBackendType
 from acquantumconnector.model.errors import AcQuantumRequestError
-from providers.acquantum.acquantumerrors import AcQuantumError, AcQuantumBackendError
-from providers.acquantum.acquantumjob import AcQuantumJob
-from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
+from .acquantumerrors import AcQuantumError, AcQuantumBackendError
+from .acquantumjob import AcQuantumJob
+from .backendconfiguration import AcQuantumBackendConfiguration
 
 
 class AcQuantumBackend(BaseBackend):

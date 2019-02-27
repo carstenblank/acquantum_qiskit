@@ -19,8 +19,8 @@ from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from jsonschema import ValidationError
 from qiskit.providers import BaseProvider
 
-from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
+from .acquantumbackend import AcQuantumBackend
+from .backendconfiguration import AcQuantumBackendConfiguration
 
 
 class AcQuantumSingleProvider(BaseProvider):
@@ -42,11 +42,9 @@ class AcQuantumSingleProvider(BaseProvider):
         :param kwargs:
         :return:
         """
-
         backends = self._backends.items()
-
         if name:
-            kwargs['backend_name'] = name
+            backends = [b for n, b in backends if n == name]
 
         return backends
 

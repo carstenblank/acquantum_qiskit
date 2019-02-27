@@ -18,10 +18,10 @@ from collections import OrderedDict
 from qiskit.providers import BaseProvider
 
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
-from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.acquantumerrors import AcQuantumAccountError, AcQuantumBackendError
-from providers.acquantum.acquantumsingleprovider import AcQuantumSingleProvider
-from providers.acquantum.credentials import discover_credentials
+from .acquantumbackend import AcQuantumBackend
+from .acquantumerrors import AcQuantumAccountError, AcQuantumBackendError
+from .acquantumsingleprovider import AcQuantumSingleProvider
+from .credentials import discover_credentials
 
 
 class AcQuantumProvider(BaseProvider):
@@ -51,8 +51,11 @@ class AcQuantumProvider(BaseProvider):
             raise AcQuantumBackendError('zero backends found')
         return backends
 
-    def load_account(self):
-        self._append_account(discover_credentials())
+    def load_account(self, credentials=None):
+        if credentials is None:
+            self._append_account(discover_credentials())
+        else:
+            self._append_account(credentials)
 
         if not self._accounts:
             raise AcQuantumAccountError('No AcQuantum credentials found.')
