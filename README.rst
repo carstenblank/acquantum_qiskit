@@ -2,8 +2,8 @@
     :target: https://acquantum_qiskit.readthedocs.io/en/latest/?badge=latest
     :alt: Read the Docs
 
-.. image:: https://img.shields.io/travis/com/sebboer/acquantum_qiskit.svg?style=for-the-badge
-    :target: https://travis-ci.com/sebboer/acquantum_qiskit
+.. image:: https://img.shields.io/travis/com/carstenblank/acquantum_qiskit.svg?style=for-the-badge
+    :target: https://travis-ci.com/carstenblank/acquantum_qiskit
     :alt: Travis Build
 
 .. image:: https://img.shields.io/codacy/grade/83e6c1a12f7942998cbbeb3d34f08964.svg?style=for-the-badge
