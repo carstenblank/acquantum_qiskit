@@ -48,7 +48,6 @@ class TestAcQuantumProvider(TestCase):
         self.provider.load_account()
         accounts = self.provider._accounts
         self.assertTrue(os.environ['ACQ_USER'] in accounts)
-        single_prov_mock.assert_called()
         if single_prov_mock.call_count == 0:
             msg = ("Expected '%s' to have been called." %
                    single_prov_mock._mock_name or 'mock')
