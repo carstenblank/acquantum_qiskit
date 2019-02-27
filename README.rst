@@ -1,3 +1,6 @@
+acquantum-qiskit
+################
+
 .. image:: https://img.shields.io/readthedocs/acquantum_qiskit.svg?style=for-the-badge
     :target: https://acquantum_qiskit.readthedocs.io/en/latest/?badge=latest
     :alt: Read the Docs
@@ -17,3 +20,29 @@
 .. image:: https://img.shields.io/pypi/pyversions/acquantum_qiskit.svg?style=for-the-badge
     :alt: PyPI - Python Version
     :target: https://pypi.org/project/acquantum-connector
+
+A qiskit provider for the Alibaba's quantum computer.
+
+Installation
+============
+
+This plugin requires Python version 3.5 and above, as well as qiskit.
+Installation can be done using pip:
+
+Install from PyPI
+-----------------
+
+.. code-block:: bash
+
+    $ pip install acquantum-qiskit
+
+Getting started
+===============
+
+License
+=======
+
+The AcQuantum Qiskit Provider is **free** and **open source**, released under
+the `Apache License, Version 2.0 <https://www.apache.org/licenses/LICENSE-2.0>`_.
+
+.. license-end-inclusion-marker-do-not-remove
