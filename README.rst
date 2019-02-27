@@ -39,6 +39,16 @@ Install from PyPI
 Getting started
 ===============
 
+
+Contributing
+============
+
+We welcome contributions - simply fork the repository of this plugin, and then make a
+`pull request <https://help.github.com/articles/about-pull-requests/>`_ containing your contribution.
+All contributers to this plugin will be listed as authors on the releases.
+
+We also encourage bug reports, suggestions for new features and enhancements, and even links to cool projects or applications built on this project.
+
 License
 =======
 
