@@ -4,6 +4,6 @@ qiskit_alibaba_provider
 .. toctree::
    :maxdepth: 4
 
-   providers
+   acquantum_qiskit
    setup
    test

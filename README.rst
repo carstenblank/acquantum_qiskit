@@ -36,9 +36,57 @@ Install from PyPI
 
     $ pip install acquantum-qiskit
 
+
+.. getting-started-start-inclusion-marker-do-not-remove
+
 Getting started
 ===============
 
+As this provider is only needed to actually run a quantum circuit, pretty much the whole stack
+is identical as already known. The only difference is that the provider must be instantiated
+explicitly and the credentials must be given: either directly through user/password or by
+setting system environment variables `ACQ_USER` and `ACQ_PWD`.
+
+.. code-block:: python
+
+    import qiskit
+    import qiskit.extensions.standard as standard
+    from qiskit.circuit.measure import measure
+    from qiskit.circuit import QuantumCircuit, QuantumRegister, ClassicalRegister
+
+    from acquantum_qiskit import AcQuantumProvider
+
+    q = QuantumRegister(2, "q")
+    r = QuantumRegister(1, "r")
+    c = ClassicalRegister(2, "c")
+    ca = ClassicalRegister(1, "c^a")
+    qc = QuantumCircuit(q, r, c, ca, name="TestCircuit")
+    standard.h(qc, q[0])
+    standard.cx(qc, q[0], q[1])
+    standard.x(qc, r)
+    measure(qc, q, c)
+    measure(qc, r, ca)
+
+    # Create the provider
+    provider = AcQuantumProvider()
+
+    # load_account without arguments tries to load from system environment varables
+    # the user (ACQ_USER) and password (ACQ_PWD)
+    provider.enable_account()
+
+    # if this is not what you want instantiate instead
+    # ===> uncomment this if you want this:
+    # provider.enable_account(user='your_user', password='xxxxxxxx')
+
+    backend = provider.get_backend("SIMULATE")  # type: AcQuantumBackend
+
+    # Execute and print out the results
+    job = qiskit.execute(qc, backend, shots=1024, seed=None)
+    result = job.result()
+    print(result.get_counts())
+
+
+.. getting-started-end-inclusion-marker-do-not-remove
 
 Contributing
 ============

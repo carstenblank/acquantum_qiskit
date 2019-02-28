@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    test.providers
+    test.acquantum_qiskit
 
 Module contents
 ---------------
