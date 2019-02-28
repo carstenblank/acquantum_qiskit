@@ -15,8 +15,8 @@
 import os
 from unittest import TestCase, mock
 
-from providers.acquantum.acquantumerrors import AcQuantumBackendError
-from providers.acquantum.acquantumprovider import AcQuantumProvider
+from acquantum_qiskit.acquantumerrors import AcQuantumBackendError
+from acquantum_qiskit.acquantumprovider import AcQuantumProvider
 
 
 class SingleMock:
@@ -42,7 +42,7 @@ class TestAcQuantumProvider(TestCase):
     def setUp(self) -> None:
         super().setUp()
 
-    @mock.patch('providers.acquantum.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
+    @mock.patch('acquantum_qiskit.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
     def test_load_account(self, single_prov_mock):
         self.provider = AcQuantumProvider()
         self.provider.enable_account()
@@ -54,14 +54,14 @@ class TestAcQuantumProvider(TestCase):
             raise AssertionError(msg)
         single_prov_mock.backends.assert_not_called()
 
-    @mock.patch('providers.acquantum.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
+    @mock.patch('acquantum_qiskit.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
     def test_get_backends(self, single_prov_mock):
         self.provider = AcQuantumProvider()
         self.provider.enable_account()
         backends = self.provider.backends()
         self.assertEqual(2, len(backends))
 
-    @mock.patch('providers.acquantum.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
+    @mock.patch('acquantum_qiskit.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
     def test_get_backends_without_loading_accounts(self, single_prov_mock):
         provider = AcQuantumProvider()
         with self.assertRaises(AcQuantumBackendError):

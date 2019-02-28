@@ -13,8 +13,8 @@
 #   limitations under the License.
 
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
-from providers.acquantum.acquantumerrors import AcQuantumAccountError
-from providers.acquantum.credentials._env import read_credentials_from_environ
+from acquantum_qiskit.acquantumerrors import AcQuantumAccountError
+from acquantum_qiskit.credentials._env import read_credentials_from_environ
 
 
 def discover_credentials() -> AcQuantumCredentials:

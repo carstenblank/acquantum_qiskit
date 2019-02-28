@@ -19,9 +19,9 @@ from acquantumconnector.credentials.credentials import AcQuantumCredentials
 from acquantumconnector.model.backendtype import AcQuantumBackendType
 from acquantumconnector.model.response import AcQuantumResult, AcQuantumResultResponse
 
-from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.backendconfiguration import AcQuantumBackendConfiguration
-from providers.acquantum.models import AcQuantumExperimentDetail
+from acquantum_qiskit.acquantumbackend import AcQuantumBackend
+from acquantum_qiskit.backendconfiguration import AcQuantumBackendConfiguration
+from acquantum_qiskit.models import AcQuantumExperimentDetail
 
 
 class TestAcQuantumBackend(TestCase):

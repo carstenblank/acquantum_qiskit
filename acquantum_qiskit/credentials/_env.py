@@ -15,7 +15,7 @@
 import os
 
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
-from providers.acquantum.acquantumerrors import AcQuantumAccountError
+from acquantum_qiskit.acquantumerrors import AcQuantumAccountError
 
 VAR_MAP = {
     'ACQ_USER': 'user_name',

@@ -17,7 +17,7 @@ from unittest import TestCase, mock
 from unittest.mock import Mock
 
 from acquantumconnector.credentials.credentials import AcQuantumCredentials
-from providers.acquantum.acquantumsingleprovider import AcQuantumSingleProvider
+from acquantum_qiskit.acquantumsingleprovider import AcQuantumSingleProvider
 
 backends_config = [
     {
@@ -68,8 +68,8 @@ class TestAcQuantumSingleProvider(TestCase):
         super().setUp()
         self._cred = AcQuantumCredentials(os.environ['ACQ_USER'], os.environ['ACQ_PWD'])
 
-    @mock.patch('providers.acquantum.acquantumsingleprovider.AcQuantumConnector.create_session')
-    @mock.patch('providers.acquantum.acquantumsingleprovider.AcQuantumConnector.available_backends',
+    @mock.patch('acquantum_qiskit.acquantumsingleprovider.AcQuantumConnector.create_session')
+    @mock.patch('acquantum_qiskit.acquantumsingleprovider.AcQuantumConnector.available_backends',
                 return_value=backends_config)
     def test_init(self, available_backends, create_session):
         provider = Mock()
@@ -77,8 +77,8 @@ class TestAcQuantumSingleProvider(TestCase):
         create_session.assert_called_once_with(self._cred)
         available_backends.assert_called_once_with()
 
-    @mock.patch('providers.acquantum.acquantumsingleprovider.AcQuantumConnector.create_session')
-    @mock.patch('providers.acquantum.acquantumsingleprovider.AcQuantumConnector.available_backends',
+    @mock.patch('acquantum_qiskit.acquantumsingleprovider.AcQuantumConnector.create_session')
+    @mock.patch('acquantum_qiskit.acquantumsingleprovider.AcQuantumConnector.available_backends',
                 return_value=backends_config)
     def test_backends(self, available_backends, create_session):
         provider = Mock()

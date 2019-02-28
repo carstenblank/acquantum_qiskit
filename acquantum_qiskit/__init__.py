@@ -12,3 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+# noinspection PyUnresolvedReferences
+from .acquantumprovider import AcQuantumProvider
+# noinspection PyUnresolvedReferences
+from .credentials import AcQuantumCredentials

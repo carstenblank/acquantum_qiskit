@@ -19,10 +19,10 @@ from qiskit.result import Result
 
 from acquantumconnector.model.backendtype import AcQuantumBackendType
 from acquantumconnector.model.response import AcQuantumResultResponse, AcQuantumResult
-from providers.acquantum.acquantumbackend import AcQuantumBackend
-from providers.acquantum.acquantumerrors import AcQuantumJobError
-from providers.acquantum.acquantumjob import AcQuantumJob, AcQuantumJobStatus
-from providers.acquantum.acquantumprovider import AcQuantumProvider
+from acquantum_qiskit.acquantumbackend import AcQuantumBackend
+from acquantum_qiskit.acquantumerrors import AcQuantumJobError
+from acquantum_qiskit.acquantumjob import AcQuantumJob, AcQuantumJobStatus
+from acquantum_qiskit.acquantumprovider import AcQuantumProvider
 
 
 class TestAcQuantumJob(TestCase):

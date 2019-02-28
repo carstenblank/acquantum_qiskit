@@ -15,8 +15,8 @@
 import os
 from unittest import TestCase
 
-from providers.acquantum.acquantumerrors import AcQuantumAccountError
-from providers.acquantum.credentials import read_credentials_from_environ, discover_credentials
+from acquantum_qiskit.acquantumerrors import AcQuantumAccountError
+from acquantum_qiskit.credentials import read_credentials_from_environ, discover_credentials
 
 
 class TestCredentials(TestCase):

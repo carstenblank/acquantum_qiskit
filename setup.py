@@ -14,7 +14,7 @@
 
 from setuptools import setup
 
-with open("providers/_version.py") as f:
+with open("acquantum_qiskit/_version.py") as f:
     version = f.readlines()[-1].split()[-1].strip("\"'")
 
 with open("README.rst", "r") as fh:
@@ -24,7 +24,7 @@ with open("requirements.txt") as f:
     requirements = f.readlines()
 
 info = {
-    'name': 'acquantum-qiskit',
+    'name': 'acquantum_qiskit-qiskit',
     'version': version,
     'author': 'Carsten Blank',
     'author_email': 'blank@data-cybernetics.com',
@@ -33,10 +33,9 @@ info = {
     'url': 'https://github.com/sebboer/acquantum_qiskit',
     'install_requires': requirements,
     'packages': [
-        'providers',
-        'providers.acquantum',
-        'providers.acquantum.credentials',
-        'providers.acquantum.models'
+        'acquantum_qiskit',
+        'acquantum_qiskit.credentials',
+        'acquantum_qiskit.models'
     ],
     'license': 'Apache 2.0',
 }
