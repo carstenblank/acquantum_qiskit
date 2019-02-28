@@ -24,13 +24,13 @@ with open("requirements.txt") as f:
     requirements = f.readlines()
 
 info = {
-    'name': 'acquantum_qiskit-qiskit',
+    'name': 'acquantum_qiskit',
     'version': version,
     'author': 'Carsten Blank',
     'author_email': 'blank@data-cybernetics.com',
     'description': 'A qiskit provider for the Alibaba\'s quantum computer.',
     'long_description': long_description,
-    'url': 'https://github.com/sebboer/acquantum_qiskit',
+    'url': 'https://github.com/carstenblank/acquantum_qiskit',
     'install_requires': requirements,
     'packages': [
         'acquantum_qiskit',
