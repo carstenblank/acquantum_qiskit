@@ -45,7 +45,7 @@ class TestAcQuantumProvider(TestCase):
     @mock.patch('providers.acquantum.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
     def test_load_account(self, single_prov_mock):
         self.provider = AcQuantumProvider()
-        self.provider.load_account()
+        self.provider.enable_account()
         accounts = self.provider._accounts
         self.assertTrue(os.environ['ACQ_USER'] in accounts)
         if single_prov_mock.call_count == 0:
@@ -57,7 +57,7 @@ class TestAcQuantumProvider(TestCase):
     @mock.patch('providers.acquantum.acquantumprovider.AcQuantumSingleProvider', side_effect=SingleMock)
     def test_get_backends(self, single_prov_mock):
         self.provider = AcQuantumProvider()
-        self.provider.load_account()
+        self.provider.enable_account()
         backends = self.provider.backends()
         self.assertEqual(2, len(backends))
 

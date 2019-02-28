@@ -14,6 +14,7 @@
 
 import warnings
 from collections import OrderedDict
+from typing import Optional, List
 
 from qiskit.providers import BaseProvider
 
@@ -32,7 +33,7 @@ class AcQuantumProvider(BaseProvider):
         self._accounts = OrderedDict()
 
     def backends(self, name=None, **kwargs):
-        # type: (str, dict) -> [AcQuantumBackend]
+        # type: (str, dict) -> List[AcQuantumBackend]
         """
         :param name: name of the backend
         :param kwargs: kwargs for filtering not yet implemented
@@ -51,11 +52,23 @@ class AcQuantumProvider(BaseProvider):
             raise AcQuantumBackendError('zero backends found')
         return backends
 
-    def load_account(self, credentials=None):
-        if credentials is None:
-            self._append_account(discover_credentials())
-        else:
+    def enable_account(self, credentials=None, user=None, password=None):
+        # type: (AcQuantumProvider, AcQuantumCredentials, Optional[str], Optional[str]) -> None
+        """
+        Establishes a user/password connection to the API of the alibaba's quantum computing interface.
+        If a `AcQuantumCredentials` is given it will be used with precedence. Else you can provide a user/password.
+        If no arguments are passed, the environment variables ACQ_USER and ACQ_PWD are used, if they exist.
+
+        :param credentials: optional. if given it has precedence
+        :param user: optional, if given the argument password must also be given
+        :param password: optional, if given the argument user must also be given
+        """
+        if credentials is not None:
             self._append_account(credentials)
+        elif user is not None and password is not None:
+            self._append_account(AcQuantumCredentials(user, password))
+        else:
+            self._append_account(discover_credentials())
 
         if not self._accounts:
             raise AcQuantumAccountError('No AcQuantum credentials found.')

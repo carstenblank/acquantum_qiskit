@@ -155,7 +155,7 @@ class TestAcQuantumJob(TestCase):
         measure(qc, r, ca)
 
         provider = AcQuantumProvider()
-        provider.load_account()
+        provider.enable_account()
         backend = provider.get_backend("SIMULATE")
 
         qobj = qiskit.compile(qc, backend=backend)
@@ -180,7 +180,7 @@ class TestAcQuantumJob(TestCase):
         measure(qc, r, ca)
 
         provider = AcQuantumProvider()
-        provider.load_account()
+        provider.enable_account()
         backend = provider.get_backend("SIMULATE")  # type: AcQuantumBackend
 
         qobj = qiskit.compile(qc, backend=backend)
